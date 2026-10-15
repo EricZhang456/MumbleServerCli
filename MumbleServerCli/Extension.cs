@@ -38,7 +38,7 @@ public static class Extension
         if (timespan.Seconds >= 1)
         {
             var secondsStr = timespan.Seconds == 1 ? "second" : "seconds";
-            strings.Insert(0, $"{timespan.Seconds} {secondsStr}");
+            strings.Add($"{timespan.Seconds} {secondsStr}");
         }
 
         if (timespan.Minutes >= 1)
