@@ -48,7 +48,7 @@ public static class Config
             Console.WriteLine($"Configuration values for virtual server ID {id}:");
             foreach (var i in allConf)
             {
-                Console.WriteLine($"\"{i.Key}\": \"{i.Value}\"");
+                Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
             }
         });
         command.Subcommands.Add(getAllCommand);
@@ -72,7 +72,8 @@ public static class Config
             try
             {
                 var value = server.getConf(key);
-                Console.WriteLine($"Value of \"{key}\" for virtual server ID {id} is: \"{value}\"");
+                Console.WriteLine($"Value of \"{key}\" for virtual server ID {id} is:");
+                Console.WriteLine($"\n{value}");
             }
             catch (WriteOnlyException)
             {
