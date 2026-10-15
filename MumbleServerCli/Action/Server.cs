@@ -7,7 +7,7 @@ public static class Server
 {
     public static Command CreateServerCommand(MetaPrx meta)
     {
-        var command = new Command("server", "Manage virtual servers.");
+        var command = new Command("server", "Manage virtual servers");
 
         var idArg = new Argument<int>("id")
         {
