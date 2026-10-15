@@ -16,7 +16,6 @@ public static class Extension
 
         const int maxLength = 50;
 
-        Console.WriteLine(lines.Length);
         if (firstLine.Length <= maxLength && lines.Length == 1)
         {
             return firstLine;
