@@ -33,29 +33,32 @@ public static class Extension
     {
         var timespan = TimeSpan.FromSeconds(seconds);
 
-        var builder = new StringBuilder();
+        List<string> strings = [];
 
-        var secondsStr = timespan.Seconds == 1 ? "second" : "seconds";
-        builder.Append($"{timespan.Seconds} {secondsStr}");
+        if (timespan.Seconds >= 1)
+        {
+            var secondsStr = timespan.Seconds == 1 ? "second" : "seconds";
+            strings.Insert(0, $"{timespan.Seconds} {secondsStr}");
+        }
 
         if (timespan.Minutes >= 1)
         {
             var minuteStr = timespan.Minutes == 1 ? "minute" : "minutes";
-            builder.Insert(0, $"{timespan.Minutes} {minuteStr}, ");
+            strings.Insert(0, $"{timespan.Minutes} {minuteStr}");
         }
 
         if (timespan.Hours >= 1)
         {
             var hourStr = timespan.Hours == 1 ? "hour" : "hours";
-            builder.Insert(0, $"{timespan.Hours} {hourStr}, ");
+            strings.Insert(0, $"{timespan.Hours} {hourStr}");
         }
 
         if (timespan.Days >= 1)
         {
             var dayStr = timespan.Days == 1 ? "day" : "days";
-            builder.Insert(0, $"{timespan.Days} {dayStr}, ");
+            strings.Insert(0, $"{timespan.Days} {dayStr}");
         }
 
-        return builder.ToString();
+        return string.Join(", ", strings);
     }
 }
