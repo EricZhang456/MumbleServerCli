@@ -45,7 +45,7 @@ public static class Config
             }
 
             var allConf = server.getAllConf();
-            Console.WriteLine($"Configuration values for virtual server ID {id}:");
+            Console.WriteLine($"Configuration values for virtual server ID {id}:\n");
             foreach (var i in allConf)
             {
                 Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
@@ -88,6 +88,43 @@ public static class Config
             }
         });
         command.Subcommands.Add(getCommand);
+
+        var optionalKeyArg = new Argument<string>("key")
+        {
+            Description = "Configuration key",
+            Arity = ArgumentArity.ZeroOrOne
+        };
+        var getDefaultCommand = new Command("getdefault", "Get default configuration values for a virtual server")
+        {
+            optionalKeyArg
+        };
+        getDefaultCommand.SetAction(result =>
+        {
+            var defaultConf = meta.getDefaultConf();
+            var targetKey = result.GetValue(optionalKeyArg);
+
+            if (string.IsNullOrWhiteSpace(targetKey))
+            {
+                Console.WriteLine("Default configuration for all virtual servers:\n");
+                foreach (var i in defaultConf)
+                {
+                    Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
+                }
+            }
+            else
+            {
+                if (defaultConf.TryGetValue(targetKey, out var value))
+                {
+                    Console.WriteLine($"Value of \"{targetKey}\" for default configuration is:");
+                    Console.WriteLine($"\n{value}");
+                }
+                else
+                {
+                    Console.WriteLine($"\"{targetKey}\" is unset in default configuration.");
+                }
+            }
+        });
+        command.Subcommands.Add(getDefaultCommand);
 
         var setCommand = new Command("set", "Set configuration value for a virtual server")
         {
