@@ -56,6 +56,7 @@ public static class Server
             try
             {
                 server.start();
+                Console.WriteLine("Virtual server started.");
             }
             catch (ServerBootedException)
             {
@@ -85,6 +86,7 @@ public static class Server
             try
             {
                 server.stop();
+                Console.WriteLine("Virtual server stopped.");
             }
             catch (ServerBootedException)
             {
@@ -114,6 +116,7 @@ public static class Server
             try
             {
                 server.delete();
+                Console.WriteLine("Virtual server deleted.");
             }
             catch (ServerBootedException)
             {

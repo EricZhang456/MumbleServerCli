@@ -1,6 +1,9 @@
 ﻿using MumbleServer;
 using System.CommandLine;
-using MumbleServerCli.Action;
+using Ice;
+using Router = MumbleServerCli.Action.Router;
+using SystemException = System.SystemException;
+using TimeoutException = Ice.TimeoutException;
 
 const string CONN_STR_ENVVAR = "MUMBLE_SERVER_CLI_CONN_STR";
 const string SECRET_ENV_VAR = "MUMBLE_SERVER_CLI_SECRET";
@@ -20,23 +23,22 @@ if (!secretSet)
     Console.WriteLine($"Warning: {SECRET_ENV_VAR} not set.");
 }
 
-using var communicator = Ice.Util.initialize(ref args);
+var props = Util.createProperties();
+props.setProperty("Ice.ImplicitContext", "Shared");
+
+var initData = new InitializationData();
+initData.properties = props;
+
+using var communicator = Ice.Util.initialize(initData);
+if (secretSet)
+{
+    communicator.getImplicitContext().put("secret", secret);
+}
 var obj = communicator.stringToProxy("Meta:" + connStr);
 var meta = MetaPrxHelper.checkedCast(obj);
 if (meta is null)
 {
     throw new SystemException("Provided Ice server is not a Mumble server");
-}
-
-if (secretSet)
-{
-    var context = new Dictionary<string, string>
-    {
-#pragma warning disable CS8604
-        { "secret", secret }
-#pragma warning restore CS8604
-    };
-    meta = (MetaPrx)meta.ice_context(context);
 }
 
 Router.RegisterActions(rootCommand, meta);
@@ -50,6 +52,14 @@ var invokeConfig = new InvocationConfiguration
 try
 {
     parseResult.Invoke(invokeConfig);
+}
+catch (ConnectionRefusedException)
+{
+    Console.WriteLine("Connection refused.");
+}
+catch (TimeoutException)
+{
+    Console.WriteLine("Connection timed out.");
 }
 catch (InvalidSecretException)
 {
