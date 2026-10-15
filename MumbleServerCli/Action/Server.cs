@@ -9,6 +9,11 @@ public static class Server
     {
         var command = new Command("server", "Manage virtual servers.");
 
+        var idArg = new Argument<int>("id")
+        {
+            Description = "Virtual server ID"
+        };
+
         var getCommand = new Command("get", "Get all virtual servers");
         getCommand.SetAction(_ =>
         {
@@ -33,6 +38,93 @@ public static class Server
             Console.WriteLine($"Created virtual server with ID {server.id()}");
         });
         command.Subcommands.Add(addCommand);
+
+        var startCommand = new Command("start", "Start a virtual server")
+        {
+            idArg
+        };
+        startCommand.SetAction(result =>
+        {
+            var id = result.GetValue(idArg);
+            var server = meta.getServer(id);
+            if (server == null)
+            {
+                Console.WriteLine("Virtual server not found.");
+                return;
+            }
+
+            try
+            {
+                server.start();
+            }
+            catch (ServerBootedException)
+            {
+                Console.WriteLine("Virtual server is already running.");
+            }
+            catch (ServerFailureException)
+            {
+                Console.WriteLine("There was an error when starting the virtual server.");
+            }
+        });
+        command.Subcommands.Add(startCommand);
+
+        var stopCommand = new Command("stop", "Stop a virtual server")
+        {
+            idArg
+        };
+        stopCommand.SetAction(result =>
+        {
+            var id = result.GetValue(idArg);
+            var server = meta.getServer(id);
+            if (server == null)
+            {
+                Console.WriteLine("Virtual server not found.");
+                return;
+            }
+
+            try
+            {
+                server.stop();
+            }
+            catch (ServerBootedException)
+            {
+                Console.WriteLine("Virtual server is already stopped.");
+            }
+            catch (ServerFailureException)
+            {
+                Console.WriteLine("There was an error when stopping the virtual server.");
+            }
+        });
+        command.Subcommands.Add(stopCommand);
+
+        var deleteCommand = new Command("stop", "Delete a virtual server")
+        {
+            idArg
+        };
+        deleteCommand.SetAction(result =>
+        {
+            var id = result.GetValue(idArg);
+            var server = meta.getServer(id);
+            if (server == null)
+            {
+                Console.WriteLine("Virtual server not found.");
+                return;
+            }
+
+            try
+            {
+                server.delete();
+            }
+            catch (ServerBootedException)
+            {
+                Console.WriteLine("You must stop the virtual server first.");
+            }
+            catch (ServerFailureException)
+            {
+                Console.WriteLine("There was an error when deleting the virtual server.");
+            }
+        });
+        command.Subcommands.Add(deleteCommand);
 
         return command;
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using MumbleServer;
+﻿using MumbleServer;
 using System.CommandLine;
 using MumbleServerCli.Action;
 
@@ -33,7 +32,9 @@ if (secretSet)
 {
     var context = new Dictionary<string, string>
     {
+#pragma warning disable CS8604
         { "secret", secret }
+#pragma warning restore CS8604
     };
     meta = (MetaPrx)meta.ice_context(context);
 }
@@ -41,4 +42,16 @@ if (secretSet)
 Router.RegisterActions(rootCommand, meta);
 
 var parseResult = rootCommand.Parse(args);
-parseResult.Invoke();
+
+var invokeConfig = new InvocationConfiguration
+{
+    EnableDefaultExceptionHandler = false
+};
+try
+{
+    parseResult.Invoke(invokeConfig);
+}
+catch (InvalidSecretException)
+{
+    Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
+}
