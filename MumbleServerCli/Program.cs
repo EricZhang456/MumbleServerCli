@@ -36,6 +36,12 @@ var metaProvider = new MetaPrxProvider();
 Router.RegisterActions(rootCommand, metaProvider);
 
 var parseResult = rootCommand.Parse(args);
+// invoke now if we have errors so we can print them
+if (parseResult.Errors.Any())
+{
+    parseResult.Invoke();
+    return;
+}
 
 try {
     var props = Util.createProperties();
