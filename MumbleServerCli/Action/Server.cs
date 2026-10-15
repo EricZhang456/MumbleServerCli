@@ -97,7 +97,7 @@ public static class Server
         });
         command.Subcommands.Add(stopCommand);
 
-        var deleteCommand = new Command("stop", "Delete a virtual server")
+        var deleteCommand = new Command("delete", "Delete a virtual server")
         {
             idArg
         };
