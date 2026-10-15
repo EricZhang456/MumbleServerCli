@@ -5,7 +5,7 @@ namespace MumbleServerCli.Action;
 
 public static class Server
 {
-    public static Command CreateServerCommand(MetaPrx meta)
+    public static Command CreateServerCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("server", "Manage virtual servers");
 
@@ -17,7 +17,7 @@ public static class Server
         var getCommand = new Command("get", "Get all virtual servers");
         getCommand.SetAction(_ =>
         {
-            var servers = meta.getAllServers();
+            var servers = metaProvider.GetMetaPrx().getAllServers();
             if (servers is null or [])
             {
                 Console.WriteLine("There are no virtual servers.");
@@ -35,7 +35,7 @@ public static class Server
         var addCommand = new Command("add", "Add a new virtual server");
         addCommand.SetAction(_ =>
         {
-            var server = meta.newServer();
+            var server = metaProvider.GetMetaPrx().newServer();
             Console.WriteLine($"Created virtual server with ID {server.id()}");
         });
         command.Subcommands.Add(addCommand);
@@ -47,7 +47,7 @@ public static class Server
         startCommand.SetAction(result =>
         {
             var id = result.GetValue(idArg);
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
@@ -77,7 +77,7 @@ public static class Server
         stopCommand.SetAction(result =>
         {
             var id = result.GetValue(idArg);
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
@@ -107,7 +107,7 @@ public static class Server
         deleteCommand.SetAction(result =>
         {
             var id = result.GetValue(idArg);
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
@@ -137,7 +137,7 @@ public static class Server
         uptimeCommand.SetAction(result =>
         {
             var id = result.GetValue(idArg);
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");

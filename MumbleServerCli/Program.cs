@@ -1,6 +1,7 @@
 ﻿using MumbleServer;
 using System.CommandLine;
 using Ice;
+using MumbleServerCli;
 using Router = MumbleServerCli.Action.Router;
 using SystemException = System.SystemException;
 using TimeoutException = Ice.TimeoutException;
@@ -31,34 +32,36 @@ if (warned)
     Console.WriteLine();
 }
 
-var props = Util.createProperties();
-props.setProperty("Ice.ImplicitContext", "Shared");
-
-var initData = new InitializationData();
-initData.properties = props;
-
-using var communicator = Ice.Util.initialize(initData);
-if (secretSet)
-{
-    communicator.getImplicitContext().put("secret", secret);
-}
-var obj = communicator.stringToProxy("Meta:" + connStr);
-var meta = MetaPrxHelper.checkedCast(obj);
-if (meta is null)
-{
-    throw new SystemException("Provided Ice server is not a Mumble server");
-}
-
-Router.RegisterActions(rootCommand, meta);
+var metaProvider = new MetaPrxProvider();
+Router.RegisterActions(rootCommand, metaProvider);
 
 var parseResult = rootCommand.Parse(args);
 
-var invokeConfig = new InvocationConfiguration
-{
-    EnableDefaultExceptionHandler = false
-};
-try
-{
+try {
+    var props = Util.createProperties();
+    props.setProperty("Ice.ImplicitContext", "Shared");
+
+    var initData = new InitializationData();
+    initData.properties = props;
+
+    using var communicator = Ice.Util.initialize(initData);
+    if (secretSet)
+    {
+        communicator.getImplicitContext().put("secret", secret);
+    }
+    var obj = communicator.stringToProxy("Meta:" + connStr);
+    var meta = MetaPrxHelper.checkedCast(obj);
+    if (meta is null)
+    {
+        Console.WriteLine("Provided Ice server is not a Mumble server");
+        return;
+    }
+    metaProvider.SetMetaPrx(meta);
+
+    var invokeConfig = new InvocationConfiguration
+    {
+        EnableDefaultExceptionHandler = false
+    };
     parseResult.Invoke(invokeConfig);
 }
 catch (ConnectionRefusedException)

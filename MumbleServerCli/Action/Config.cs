@@ -5,7 +5,7 @@ namespace MumbleServerCli.Action;
 
 public static class Config
 {
-    public static Command CreateConfigCommand(MetaPrx meta)
+    public static Command CreateConfigCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("config", "Configure virtual servers");
 
@@ -37,7 +37,7 @@ public static class Config
         {
             var id = result.GetValue(idArg);
 
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
@@ -62,7 +62,7 @@ public static class Config
             var id = result.GetValue(idArg);
             var key = result.GetValue(keyArg);
 
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
@@ -100,7 +100,7 @@ public static class Config
         };
         getDefaultCommand.SetAction(result =>
         {
-            var defaultConf = meta.getDefaultConf();
+            var defaultConf = metaProvider.GetMetaPrx().getDefaultConf();
             var targetKey = result.GetValue(optionalKeyArg);
 
             if (string.IsNullOrWhiteSpace(targetKey))
@@ -136,7 +136,7 @@ public static class Config
             var key = result.GetValue(keyArg);
             var value = result.GetValue(valueArg);
 
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
@@ -157,7 +157,7 @@ public static class Config
             var id = result.GetValue(idArg);
             var password = result.GetValue(superuserPasswordArg);
 
-            var server = meta.getServer(id);
+            var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
                 Console.WriteLine("Virtual server not found.");
