@@ -1,4 +1,4 @@
-﻿using MumbleServer;
+using MumbleServer;
 using System.CommandLine;
 using Ice;
 using MumbleServerCli;

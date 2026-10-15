@@ -1,4 +1,4 @@
-﻿using MumbleServer;
+using MumbleServer;
 
 namespace MumbleServerCli;
 
