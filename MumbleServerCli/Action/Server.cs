@@ -130,6 +130,32 @@ public static class Server
         });
         command.Subcommands.Add(deleteCommand);
 
+        var uptimeCommand = new Command("uptime", "Get the uptime of a Mumble virtual server")
+        {
+            idArg
+        };
+        uptimeCommand.SetAction(result =>
+        {
+            var id = result.GetValue(idArg);
+            var server = meta.getServer(id);
+            if (server == null)
+            {
+                Console.WriteLine("Virtual server not found.");
+                return;
+            }
+
+            try
+            {
+                var uptime = server.getUptime();
+                Console.WriteLine($"Virtual server {id} has been up for: {Extension.FormatTime(uptime)}");
+            }
+            catch (ServerBootedException)
+            {
+                Console.WriteLine("Server is not running");
+            }
+        });
+        command.Subcommands.Add(uptimeCommand);
+
         return command;
     }
 }
