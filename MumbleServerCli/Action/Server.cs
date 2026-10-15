@@ -26,7 +26,8 @@ public static class Server
             Console.WriteLine($"Listing {servers.Length} servers:");
             foreach (var instance in servers)
             {
-                Console.WriteLine($"ID: {instance.id()}, Status: {(instance.isRunning() ? "running" : "stopped")}");
+                var status = instance.isRunning() ? "running" : "stopped";
+                Console.WriteLine($"ID: {instance.id()}, Status: {status}");
             }
         });
         command.Subcommands.Add(getCommand);
