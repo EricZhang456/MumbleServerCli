@@ -32,6 +32,7 @@ public static class Server
             var server = meta.newServer();
             Console.WriteLine($"Created virtual server with ID {server.id()}");
         });
+        command.Subcommands.Add(addCommand);
 
         return command;
     }

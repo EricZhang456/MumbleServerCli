@@ -1,30 +1,44 @@
-﻿using MumbleServer;
+﻿using System;
+using MumbleServer;
 using System.CommandLine;
 using MumbleServerCli.Action;
 
+const string CONN_STR_ENVVAR = "MUMBLE_SERVER_CLI_CONN_STR";
+const string SECRET_ENV_VAR = "MUMBLE_SERVER_CLI_SECRET";
+
 var rootCommand = new RootCommand("CLI program to control mumble-server via the Ice interface.");
-var connstrOpt = new Option<string>("--connstr")
+var connStr = Environment.GetEnvironmentVariable(CONN_STR_ENVVAR);
+if (string.IsNullOrWhiteSpace(connStr))
 {
-    Description = "Connection string to Mumble Ice endpoint.",
-    DefaultValueFactory = _ => "tcp -h 127.0.0.1 -p 6502 -t 60000"
-};
+    Console.WriteLine($"Warning: {CONN_STR_ENVVAR} not set. Defaulting to \"tcp -h 127.0.0.1 -p 6502 -t 60000\"");
+    connStr = "tcp -h 127.0.0.1 -p 6502 -t 60000";
+}
 
-rootCommand.Options.Add(connstrOpt);
-
-rootCommand.SetAction(result =>
+var secret = Environment.GetEnvironmentVariable(SECRET_ENV_VAR);
+var secretSet = !string.IsNullOrWhiteSpace(secret);
+if (!secretSet)
 {
-    using var communicator = Ice.Util.initialize(ref args);
-    var obj = communicator.stringToProxy("Meta:" + result.GetValue(connstrOpt));
-    var meta = MetaPrxHelper.checkedCast(obj);
-    if (meta is null)
+    Console.WriteLine($"Warning: {SECRET_ENV_VAR} not set.");
+}
+
+using var communicator = Ice.Util.initialize(ref args);
+var obj = communicator.stringToProxy("Meta:" + connStr);
+var meta = MetaPrxHelper.checkedCast(obj);
+if (meta is null)
+{
+    throw new SystemException("Provided Ice server is not a Mumble server");
+}
+
+if (secretSet)
+{
+    var context = new Dictionary<string, string>
     {
-        throw new SystemException("Provided Ice server is not a Mumble server");
-    }
+        { "secret", secret }
+    };
+    meta = (MetaPrx)meta.ice_context(context);
+}
 
-    Router.RegisterActions(rootCommand, meta);
-});
+Router.RegisterActions(rootCommand, meta);
 
 var parseResult = rootCommand.Parse(args);
-using var communicator = Ice.Util.initialize(ref args);
-
 parseResult.Invoke();
