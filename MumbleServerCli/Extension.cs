@@ -24,8 +24,7 @@ public static class Extension
         var truncatedChars = Math.Min(maxLength, firstLine.Length);
         var truncated = firstLine[..truncatedChars];
 
-        var totalCharactersWithoutNewLines = str.Count(c => c != '\r' && c != '\n');
-        var remainingCharacters = totalCharactersWithoutNewLines - truncatedChars;
+        var remainingCharacters = str.Length - truncatedChars;
 
         return $"{truncated}... <{remainingCharacters} more characters>";
     }
@@ -36,21 +35,25 @@ public static class Extension
 
         var builder = new StringBuilder();
 
-        builder.Append($"{timespan.Seconds} seconds");
+        var secondsStr = timespan.Seconds == 1 ? "second" : "seconds";
+        builder.Append($"{timespan.Seconds} {secondsStr}");
 
         if (timespan.Minutes >= 1)
         {
-            builder.Insert(0, $"{timespan.Minutes} minutes, ");
+            var minuteStr = timespan.Minutes == 1 ? "minute" : "minutes";
+            builder.Insert(0, $"{timespan.Minutes} {minuteStr}, ");
         }
 
         if (timespan.Hours >= 1)
         {
-            builder.Insert(0, $"{timespan.Hours} hours, ");
+            var hourStr = timespan.Hours == 1 ? "hour" : "hours";
+            builder.Insert(0, $"{timespan.Hours} {hourStr}, ");
         }
 
         if (timespan.Days >= 1)
         {
-            builder.Insert(0, $"{timespan.Days} days, ");
+            var dayStr = timespan.Days == 1 ? "day" : "days";
+            builder.Insert(0, $"{timespan.Days} {dayStr}, ");
         }
 
         return builder.ToString();
