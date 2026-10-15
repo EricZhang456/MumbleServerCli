@@ -72,8 +72,15 @@ public static class Config
             try
             {
                 var value = server.getConf(key);
-                Console.WriteLine($"Value of \"{key}\" for virtual server ID {id} is:");
-                Console.WriteLine($"\n{value}");
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    Console.WriteLine($"Value of \"{key}\" for virtual server ID {id} is:");
+                    Console.WriteLine($"\n{value}");
+                }
+                else
+                {
+                    Console.WriteLine($"\"{key}\" is unset for virtual server {id}.");
+                }
             }
             catch (WriteOnlyException)
             {
