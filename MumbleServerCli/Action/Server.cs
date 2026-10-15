@@ -23,7 +23,7 @@ public static class Server
                 Console.WriteLine("There are no virtual servers.");
                 return;
             }
-            Console.WriteLine($"Listing {servers.Length} servers:");
+            Console.WriteLine($"Listing {servers.Length} server(s):");
             foreach (var instance in servers)
             {
                 var status = instance.isRunning() ? "running" : "stopped";
