@@ -1,6 +1,5 @@
 ﻿using MumbleServer;
 using System.CommandLine;
-using System.Globalization;
 using Ice;
 using Router = MumbleServerCli.Action.Router;
 using SystemException = System.SystemException;
