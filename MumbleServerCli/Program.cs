@@ -37,13 +37,20 @@ var metaProvider = new MetaPrxProvider();
 Router.RegisterActions(rootCommand, metaProvider);
 
 var parseResult = rootCommand.Parse(args);
-// VersionOptionAction is private so this is what we'll need to do
-var versionActionType = new VersionOption().Action!.GetType();
 // invoke now if we have errors so we can print them
-if (parseResult.Action is ParseErrorAction or HelpAction || parseResult.Action?.GetType() == versionActionType)
+if (parseResult.Action is ParseErrorAction)
 {
     parseResult.Invoke();
     return 1;
+}
+
+// VersionOptionAction is private so this is what we'll need to do
+var versionActionType = new VersionOption().Action!.GetType();
+// invoke now if --help or --version is issued
+if (parseResult.Action is HelpAction || parseResult.Action?.GetType() == versionActionType)
+{
+    parseResult.Invoke();
+    return 0;
 }
 
 try
