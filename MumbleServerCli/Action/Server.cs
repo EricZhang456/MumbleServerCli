@@ -70,8 +70,7 @@ public static class Server
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             try
@@ -79,13 +78,13 @@ public static class Server
                 server.start();
                 Console.WriteLine("Virtual server started.");
             }
-            catch (ServerBootedException)
+            catch (ServerBootedException e)
             {
-                Console.WriteLine("Virtual server is already running.");
+                throw new MumbleServerCliException("Virtual server is already running.", e);
             }
-            catch (ServerFailureException)
+            catch (ServerFailureException e)
             {
-                Console.WriteLine("There was an error when starting the virtual server.");
+                throw new MumbleServerCliException("There was an error when starting the virtual server.", e);
             }
         });
 
@@ -104,8 +103,7 @@ public static class Server
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             try
@@ -113,13 +111,13 @@ public static class Server
                 server.stop();
                 Console.WriteLine("Virtual server stopped.");
             }
-            catch (ServerBootedException)
+            catch (ServerBootedException e)
             {
-                Console.WriteLine("Virtual server is already stopped.");
+                throw new MumbleServerCliException("Virtual server is already stopped.", e);
             }
-            catch (ServerFailureException)
+            catch (ServerFailureException e)
             {
-                Console.WriteLine("There was an error when stopping the virtual server.");
+                throw new MumbleServerCliException("There was an error when stopping the virtual server.", e);
             }
         });
 
@@ -138,8 +136,7 @@ public static class Server
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             try
@@ -147,13 +144,13 @@ public static class Server
                 server.delete();
                 Console.WriteLine("Virtual server deleted.");
             }
-            catch (ServerBootedException)
+            catch (ServerBootedException e)
             {
-                Console.WriteLine("You must stop the virtual server first.");
+                throw new MumbleServerCliException("You must stop the virtual server first.", e);
             }
-            catch (ServerFailureException)
+            catch (ServerFailureException e)
             {
-                Console.WriteLine("There was an error when deleting the virtual server.");
+                throw new MumbleServerCliException("There was an error when deleting the virtual server.", e);
             }
         });
 
@@ -172,8 +169,7 @@ public static class Server
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             try
@@ -181,9 +177,9 @@ public static class Server
                 var uptime = server.getUptime();
                 Console.WriteLine($"Virtual server {id} has been up for: {Extension.FormatTime(uptime)}");
             }
-            catch (ServerBootedException)
+            catch (ServerBootedException e)
             {
-                Console.WriteLine("Server is not running");
+                throw new MumbleServerCliException("Server is not running", e);
             }
         });
 

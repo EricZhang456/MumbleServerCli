@@ -51,8 +51,7 @@ public static class Config
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             var allConf = server.getAllConf();
@@ -80,8 +79,7 @@ public static class Config
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             try
@@ -162,8 +160,7 @@ public static class Config
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             server.setConf(key, value);
@@ -187,8 +184,7 @@ public static class Config
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
-                Console.WriteLine("Virtual server not found.");
-                return;
+                throw new MumbleServerCliException("Virtual server not found.");
             }
 
             server.setSuperuserPassword(password);

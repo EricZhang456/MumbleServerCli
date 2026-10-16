@@ -3,7 +3,6 @@ using System.CommandLine;
 using Ice;
 using MumbleServerCli;
 using Router = MumbleServerCli.Action.Router;
-using SystemException = System.SystemException;
 using TimeoutException = Ice.TimeoutException;
 
 const string CONN_STR_ENVVAR = "MUMBLE_SERVER_CLI_CONN_STR";
@@ -40,10 +39,11 @@ var parseResult = rootCommand.Parse(args);
 if (parseResult.Errors.Any())
 {
     parseResult.Invoke();
-    return;
+    return 1;
 }
 
-try {
+try
+{
     var props = Util.createProperties();
     props.setProperty("Ice.ImplicitContext", "Shared");
 
@@ -55,13 +55,15 @@ try {
     {
         communicator.getImplicitContext().put("secret", secret);
     }
+
     var obj = communicator.stringToProxy("Meta:" + connStr);
     var meta = MetaPrxHelper.checkedCast(obj);
     if (meta is null)
     {
         Console.WriteLine("Provided Ice server is not a Mumble server");
-        return;
+        return 1;
     }
+
     metaProvider.SetMetaPrx(meta);
 
     var invokeConfig = new InvocationConfiguration
@@ -69,16 +71,26 @@ try {
         EnableDefaultExceptionHandler = false
     };
     parseResult.Invoke(invokeConfig);
+
+    return 0;
 }
 catch (ConnectionRefusedException)
 {
     Console.WriteLine("Connection refused.");
+    return 1;
 }
 catch (TimeoutException)
 {
     Console.WriteLine("Connection timed out.");
+    return 1;
 }
 catch (InvalidSecretException)
 {
     Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
+    return 1;
+}
+catch (MumbleServerCliException e)
+{
+    Console.WriteLine(e.Message);
+    return 1;
 }
