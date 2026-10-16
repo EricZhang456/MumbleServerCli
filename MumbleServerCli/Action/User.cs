@@ -36,7 +36,7 @@ public static class User
                 return;
             }
 
-            Console.WriteLine($"Listing {users.Count} user(s):");
+            Console.WriteLine($"Listing {users.Count} user(s):\n");
             Console.WriteLine();
             foreach (var entry in users)
             {
