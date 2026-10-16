@@ -5,11 +5,6 @@ namespace MumbleServerCli.Action;
 
 public static class Config
 {
-    private static readonly Argument<int> IdArg = new("id")
-    {
-        Description = "Virtual Server ID"
-    };
-
     private static readonly Argument<string> KeyArg = new("key")
     {
         Description = "Configuration key"
@@ -42,14 +37,14 @@ public static class Config
     {
         var getAllCommand = new Command("getall", "Get all configuration values for a virtual server")
         {
-            IdArg
+            CommonArgs.IdArg
         };
         getAllCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -69,15 +64,15 @@ public static class Config
     {
         var getCommand = new Command("get", "Get configuration value for a virtual server")
         {
-            IdArg, KeyArg
+            CommonArgs.IdArg, KeyArg
         };
         getCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var key = result.GetValue(KeyArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -149,16 +144,16 @@ public static class Config
     {
         var setCommand = new Command("set", "Set configuration value for a virtual server")
         {
-            IdArg, KeyArg, ValueArg
+            CommonArgs.IdArg, KeyArg, ValueArg
         };
         setCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var key = result.GetValue(KeyArg);
             var value = result.GetValue(ValueArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -174,15 +169,15 @@ public static class Config
     {
         var setSuperuserPasswordCommand = new Command("setsupw", "Set Superuser password for a virtual server")
         {
-            IdArg, SuperuserPasswordArg
+            CommonArgs.IdArg, SuperuserPasswordArg
         };
         setSuperuserPasswordCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var password = result.GetValue(SuperuserPasswordArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }

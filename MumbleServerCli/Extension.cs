@@ -59,4 +59,6 @@ public static class Extension
 
         return string.Join(", ", strings);
     }
+
+    public static string FormatBool(bool value) => value ? "yes" : "no";
 }

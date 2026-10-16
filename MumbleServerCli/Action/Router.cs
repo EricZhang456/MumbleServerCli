@@ -9,5 +9,6 @@ public static class Router
         command.Subcommands.Add(Server.CreateServerCommand(metaProvider));
         command.Subcommands.Add(Config.CreateConfigCommand(metaProvider));
         command.Subcommands.Add(Uptime.CreateUptimeCommand(metaProvider));
+        command.Subcommands.Add(User.CreateUserCommand(metaProvider));
     }
 }

@@ -5,11 +5,6 @@ namespace MumbleServerCli.Action;
 
 public static class Server
 {
-    private static readonly Argument<int> IdArg = new("id")
-    {
-        Description = "Virtual server ID"
-    };
-
     public static Command CreateServerCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("server", "Manage virtual servers");
@@ -62,13 +57,13 @@ public static class Server
     {
         var startCommand = new Command("start", "Start a virtual server")
         {
-            IdArg
+            CommonArgs.IdArg
         };
         startCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -95,13 +90,13 @@ public static class Server
     {
         var stopCommand = new Command("stop", "Stop a virtual server")
         {
-            IdArg
+            CommonArgs.IdArg
         };
         stopCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -128,13 +123,13 @@ public static class Server
     {
         var deleteCommand = new Command("delete", "Delete a virtual server")
         {
-            IdArg
+            CommonArgs.IdArg
         };
         deleteCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -161,13 +156,13 @@ public static class Server
     {
         var uptimeCommand = new Command("uptime", "Get the uptime of a Mumble virtual server")
         {
-            IdArg
+            CommonArgs.IdArg
         };
         uptimeCommand.SetAction(result =>
         {
-            var id = result.GetValue(IdArg);
+            var id = result.GetValue(CommonArgs.IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server == null)
+            if (server is null)
             {
                 throw new MumbleServerCliException("Virtual server not found.");
             }
@@ -179,7 +174,7 @@ public static class Server
             }
             catch (ServerBootedException e)
             {
-                throw new MumbleServerCliException("Server is not running", e);
+                throw new MumbleServerCliException("Virtual server is not running.", e);
             }
         });
 
