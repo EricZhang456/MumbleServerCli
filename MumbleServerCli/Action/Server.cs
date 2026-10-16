@@ -43,7 +43,7 @@ public static class Server
 
     private static Command CreateAddCommand(MetaPrxProvider metaProvider)
     {
-        var addCommand = new Command("add", "Add a new virtual server");
+        var addCommand = new Command("create", "Create a new virtual server");
         addCommand.SetAction(_ =>
         {
             var server = metaProvider.GetMetaPrx().newServer();
