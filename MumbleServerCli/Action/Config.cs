@@ -53,7 +53,12 @@ public static class Config
             if (string.IsNullOrWhiteSpace(key))
             {
                 var allConf = server.getAllConf();
-                Console.WriteLine($"Configuration values for virtual server ID {id}:\n");
+                if (allConf.Count == 0)
+                {
+                    Console.WriteLine($"Virtual server {id} has no configuration values.");
+                    return;
+                }
+                Console.WriteLine($"Configuration values for virtual server {id}:\n");
                 foreach (var i in allConf)
                 {
                     Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
@@ -66,7 +71,7 @@ public static class Config
                 var value = server.getConf(key);
                 if (!string.IsNullOrWhiteSpace(value))
                 {
-                    Console.WriteLine($"Value of \"{key}\" for virtual server ID {id} is:");
+                    Console.WriteLine($"Value of \"{key}\" for virtual server {id} is:");
                     Console.WriteLine($"\n{value}");
                 }
                 else
