@@ -5,37 +5,48 @@ namespace MumbleServerCli.Action;
 
 public static class Config
 {
+    private static readonly Argument<int> IdArg = new("id")
+    {
+        Description = "Virtual Server ID"
+    };
+
+    private static readonly Argument<string> KeyArg = new("key")
+    {
+        Description = "Configuration key"
+    };
+
+    private static readonly Argument<string> ValueArg = new("value")
+    {
+        Description = "Configuration value"
+    };
+
+    private static readonly Argument<string> SuperuserPasswordArg = new("password")
+    {
+        Description = "Superuser password"
+    };
+
     public static Command CreateConfigCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("config", "Configure virtual servers");
 
-        var idArg = new Argument<int>("id")
-        {
-            Description = "Virtual Server ID"
-        };
+        command.Subcommands.Add(CreateGetAllCommand(metaProvider));
+        command.Subcommands.Add(CreateGetCommand(metaProvider));
+        command.Subcommands.Add(CreateGetDefaultCommand(metaProvider));
+        command.Subcommands.Add(CreateSetCommand(metaProvider));
+        command.Subcommands.Add(CreateSetSuperuserCommand(metaProvider));
 
-        var keyArg = new Argument<string>("key")
-        {
-            Description = "Configuration key"
-        };
+        return command;
+    }
 
-        var valueArg = new Argument<string>("value")
-        {
-            Description = "Configuration value"
-        };
-
-        var superuserPasswordArg = new Argument<string>("password")
-        {
-            Description = "Superuser password"
-        };
-
+    private static Command CreateGetAllCommand(MetaPrxProvider metaProvider)
+    {
         var getAllCommand = new Command("getall", "Get all configuration values for a virtual server")
         {
-            idArg
+            IdArg
         };
         getAllCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
+            var id = result.GetValue(IdArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
@@ -51,16 +62,20 @@ public static class Config
                 Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
             }
         });
-        command.Subcommands.Add(getAllCommand);
 
+        return getAllCommand;
+    }
+
+    private static Command CreateGetCommand(MetaPrxProvider metaProvider)
+    {
         var getCommand = new Command("get", "Get configuration value for a virtual server")
         {
-            idArg, keyArg
+            IdArg, KeyArg
         };
         getCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
-            var key = result.GetValue(keyArg);
+            var id = result.GetValue(IdArg);
+            var key = result.GetValue(KeyArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
@@ -87,8 +102,12 @@ public static class Config
                 Console.WriteLine("This value is secret.");
             }
         });
-        command.Subcommands.Add(getCommand);
 
+        return getCommand;
+    }
+
+    private static Command CreateGetDefaultCommand(MetaPrxProvider metaProvider)
+    {
         var optionalKeyArg = new Argument<string>("key")
         {
             Description = "Configuration key",
@@ -124,17 +143,21 @@ public static class Config
                 }
             }
         });
-        command.Subcommands.Add(getDefaultCommand);
 
+        return getDefaultCommand;
+    }
+
+    private static Command CreateSetCommand(MetaPrxProvider metaProvider)
+    {
         var setCommand = new Command("set", "Set configuration value for a virtual server")
         {
-            idArg, keyArg, valueArg
+            IdArg, KeyArg, ValueArg
         };
         setCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
-            var key = result.GetValue(keyArg);
-            var value = result.GetValue(valueArg);
+            var id = result.GetValue(IdArg);
+            var key = result.GetValue(KeyArg);
+            var value = result.GetValue(ValueArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
@@ -146,16 +169,20 @@ public static class Config
             server.setConf(key, value);
             Console.WriteLine("Configuration value changed");
         });
-        command.Subcommands.Add(setCommand);
 
+        return setCommand;
+    }
+
+    private static Command CreateSetSuperuserCommand(MetaPrxProvider metaProvider)
+    {
         var setSuperuserPasswordCommand = new Command("setsupw", "Set Superuser password for a virtual server")
         {
-            idArg, superuserPasswordArg
+            IdArg, SuperuserPasswordArg
         };
         setSuperuserPasswordCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
-            var password = result.GetValue(superuserPasswordArg);
+            var id = result.GetValue(IdArg);
+            var password = result.GetValue(SuperuserPasswordArg);
 
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
@@ -167,8 +194,7 @@ public static class Config
             server.setSuperuserPassword(password);
             Console.WriteLine("Superuser password changed");
         });
-        command.Subcommands.Add(setSuperuserPasswordCommand);
 
-        return command;
+        return setSuperuserPasswordCommand;
     }
 }

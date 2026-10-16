@@ -5,17 +5,29 @@ namespace MumbleServerCli.Action;
 
 public static class Server
 {
+    private static readonly Argument<int> IdArg = new("id")
+    {
+        Description = "Virtual server ID"
+    };
+
     public static Command CreateServerCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("server", "Manage virtual servers");
 
-        var idArg = new Argument<int>("id")
-        {
-            Description = "Virtual server ID"
-        };
+        command.Subcommands.Add(CreateListCommand(metaProvider));
+        command.Subcommands.Add(CreateAddCommand(metaProvider));
+        command.Subcommands.Add(CreateStartCommand(metaProvider));
+        command.Subcommands.Add(CreateStopCommand(metaProvider));
+        command.Subcommands.Add(CreateDeleteCommand(metaProvider));
+        command.Subcommands.Add(CreateUptimeCommand(metaProvider));
 
-        var getCommand = new Command("get", "Get all virtual servers");
-        getCommand.SetAction(_ =>
+        return command;
+    }
+
+    private static Command CreateListCommand(MetaPrxProvider metaProvider)
+    {
+        var listCommand = new Command("list", "List all virtual servers");
+        listCommand.SetAction(_ =>
         {
             var servers = metaProvider.GetMetaPrx().getAllServers();
             if (servers is null or [])
@@ -30,23 +42,31 @@ public static class Server
                 Console.WriteLine($"ID: {instance.id()}, Status: {status}");
             }
         });
-        command.Subcommands.Add(getCommand);
 
+        return listCommand;
+    }
+
+    private static Command CreateAddCommand(MetaPrxProvider metaProvider)
+    {
         var addCommand = new Command("add", "Add a new virtual server");
         addCommand.SetAction(_ =>
         {
             var server = metaProvider.GetMetaPrx().newServer();
             Console.WriteLine($"Created virtual server with ID {server.id()}");
         });
-        command.Subcommands.Add(addCommand);
 
+        return addCommand;
+    }
+
+    private static Command CreateStartCommand(MetaPrxProvider metaProvider)
+    {
         var startCommand = new Command("start", "Start a virtual server")
         {
-            idArg
+            IdArg
         };
         startCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
+            var id = result.GetValue(IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
@@ -68,15 +88,19 @@ public static class Server
                 Console.WriteLine("There was an error when starting the virtual server.");
             }
         });
-        command.Subcommands.Add(startCommand);
 
+        return startCommand;
+    }
+
+    private static Command CreateStopCommand(MetaPrxProvider metaProvider)
+    {
         var stopCommand = new Command("stop", "Stop a virtual server")
         {
-            idArg
+            IdArg
         };
         stopCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
+            var id = result.GetValue(IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
@@ -98,15 +122,19 @@ public static class Server
                 Console.WriteLine("There was an error when stopping the virtual server.");
             }
         });
-        command.Subcommands.Add(stopCommand);
 
+        return stopCommand;
+    }
+
+    private static Command CreateDeleteCommand(MetaPrxProvider metaProvider)
+    {
         var deleteCommand = new Command("delete", "Delete a virtual server")
         {
-            idArg
+            IdArg
         };
         deleteCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
+            var id = result.GetValue(IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
@@ -128,15 +156,19 @@ public static class Server
                 Console.WriteLine("There was an error when deleting the virtual server.");
             }
         });
-        command.Subcommands.Add(deleteCommand);
 
+        return deleteCommand;
+    }
+
+    private static Command CreateUptimeCommand(MetaPrxProvider metaProvider)
+    {
         var uptimeCommand = new Command("uptime", "Get the uptime of a Mumble virtual server")
         {
-            idArg
+            IdArg
         };
         uptimeCommand.SetAction(result =>
         {
-            var id = result.GetValue(idArg);
+            var id = result.GetValue(IdArg);
             var server = metaProvider.GetMetaPrx().getServer(id);
             if (server == null)
             {
@@ -154,8 +186,7 @@ public static class Server
                 Console.WriteLine("Server is not running");
             }
         });
-        command.Subcommands.Add(uptimeCommand);
 
-        return command;
+        return uptimeCommand;
     }
 }
