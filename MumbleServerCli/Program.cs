@@ -1,5 +1,7 @@
 using MumbleServer;
 using System.CommandLine;
+using System.CommandLine.Help;
+using System.CommandLine.Invocation;
 using Ice;
 using MumbleServerCli;
 using Router = MumbleServerCli.Action.Router;
@@ -35,8 +37,10 @@ var metaProvider = new MetaPrxProvider();
 Router.RegisterActions(rootCommand, metaProvider);
 
 var parseResult = rootCommand.Parse(args);
+// VersionOptionAction is private so this is what we'll need to do
+var versionActionType = new VersionOption().Action!.GetType();
 // invoke now if we have errors so we can print them
-if (parseResult.Errors.Any())
+if (parseResult.Action is ParseErrorAction or HelpAction || parseResult.Action?.GetType() == versionActionType)
 {
     parseResult.Invoke();
     return 1;
