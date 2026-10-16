@@ -32,13 +32,7 @@ public static class User
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
             try
             {
@@ -73,14 +67,8 @@ public static class User
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var sessionId = result.GetValue(SessionArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {
@@ -174,15 +162,9 @@ public static class User
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var sessionId = result.GetValue(SessionArg);
             var reason = result.GetValue(reasonArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {
@@ -210,14 +192,8 @@ public static class User
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var sessionId = result.GetValue(SessionArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {

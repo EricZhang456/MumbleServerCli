@@ -30,13 +30,7 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
             try
             {
@@ -70,14 +64,8 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var channelId = result.GetValue(ChannelIdArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {
@@ -152,15 +140,9 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var channelName = result.GetValue(channelNameArg);
             var parentChannelId = result.GetValue(parentChannelIdOpt);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {
@@ -194,14 +176,8 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var channelId = result.GetValue(ChannelIdArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {
@@ -230,14 +206,8 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var serverId = result.GetValue(CommonArgs.IdArg);
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var channelId = result.GetValue(ChannelIdArg);
-            var meta = metaProvider.GetMetaPrx();
-            var server = meta.getServer(serverId);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
 
             try
             {

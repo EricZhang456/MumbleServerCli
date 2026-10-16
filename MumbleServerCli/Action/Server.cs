@@ -61,12 +61,7 @@ public static class Server
         };
         startCommand.SetAction(result =>
         {
-            var id = result.GetValue(CommonArgs.IdArg);
-            var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
             try
             {
@@ -94,12 +89,7 @@ public static class Server
         };
         stopCommand.SetAction(result =>
         {
-            var id = result.GetValue(CommonArgs.IdArg);
-            var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
             try
             {
@@ -127,12 +117,7 @@ public static class Server
         };
         deleteCommand.SetAction(result =>
         {
-            var id = result.GetValue(CommonArgs.IdArg);
-            var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
             try
             {
@@ -160,17 +145,12 @@ public static class Server
         };
         uptimeCommand.SetAction(result =>
         {
-            var id = result.GetValue(CommonArgs.IdArg);
-            var server = metaProvider.GetMetaPrx().getServer(id);
-            if (server is null)
-            {
-                throw new MumbleServerCliException("Virtual server not found.");
-            }
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
             try
             {
                 var uptime = server.getUptime();
-                Console.WriteLine($"Virtual server {id} has been up for: {Extension.FormatTime(uptime)}");
+                Console.WriteLine($"Virtual server {server.id()} has been up for: {Extension.FormatTime(uptime)}");
             }
             catch (ServerBootedException e)
             {

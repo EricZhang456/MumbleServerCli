@@ -10,3 +10,14 @@ public class MumbleServerCliException : Exception
     {
     }
 }
+
+public class MumbleServerNotFoundException : MumbleServerCliException
+{
+    public MumbleServerNotFoundException(string message) : base(message)
+    {
+    }
+
+    public MumbleServerNotFoundException(string message, Exception inner) : base(message, inner)
+    {
+    }
+}
