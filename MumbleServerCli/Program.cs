@@ -12,7 +12,7 @@ const string CONN_STR_ENVVAR = "MUMBLE_SERVER_CLI_CONN_STR";
 const string SECRET_ENV_VAR = "MUMBLE_SERVER_CLI_SECRET";
 
 var warned = false;
-var rootCommand = new RootCommand("CLI program to control mumble-server via the Ice interface.");
+var rootCommand = new RootCommand("Control mumble-server via the Ice interface.");
 var connStr = Environment.GetEnvironmentVariable(CONN_STR_ENVVAR);
 if (string.IsNullOrWhiteSpace(connStr))
 {
