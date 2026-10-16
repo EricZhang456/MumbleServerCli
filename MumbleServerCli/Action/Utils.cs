@@ -9,6 +9,6 @@ public static class Utils
         var serverId = result.GetValue(CommonArgs.IdArg);
         var meta = metaProvider.GetMetaPrx();
         var server = meta.getServer(serverId);
-        return server ?? throw new MumbleServerNotFoundException("Virtual server not found.");
+        return server ?? throw new MumbleServerNotFoundException();
     }
 }

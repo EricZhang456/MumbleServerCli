@@ -13,6 +13,10 @@ public class MumbleServerCliException : Exception
 
 public class MumbleServerNotFoundException : MumbleServerCliException
 {
+    public MumbleServerNotFoundException() : base("Virtual server not found.")
+    {
+    }
+
     public MumbleServerNotFoundException(string message) : base(message)
     {
     }
