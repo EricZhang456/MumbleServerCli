@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace MumbleServerCli;
 
 public static class Extension

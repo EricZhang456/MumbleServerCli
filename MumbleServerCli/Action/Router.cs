@@ -1,5 +1,4 @@
 using System.CommandLine;
-using MumbleServer;
 
 namespace MumbleServerCli.Action;
 
