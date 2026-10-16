@@ -18,6 +18,7 @@ public static class Channel
         command.Subcommands.Add(CreateChannelInfoCommand(metaProvider));
         command.Subcommands.Add(CreateAddChannelCommand(metaProvider));
         command.Subcommands.Add(CreateRemoveChannelCommand(metaProvider));
+        command.Subcommands.Add(CreateGetDescriptionCommand(metaProvider));
 
         return command;
     }
