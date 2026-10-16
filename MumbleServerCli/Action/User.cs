@@ -19,6 +19,7 @@ public static class User
         command.Subcommands.Add(CreateListUsersCommand(metaProvider));
         command.Subcommands.Add(CreateUserInfoCommand(metaProvider));
         command.Subcommands.Add(CreateKickUserCommand(metaProvider));
+        command.Subcommands.Add(CreateGetCommentCommand(metaProvider));
 
         return command;
     }
@@ -66,7 +67,7 @@ public static class User
 
     private static Command CreateUserInfoCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("info", "Get information about a session on a virtual server")
+        var command = new Command("info", "Get information about a user on a virtual server")
         {
             CommonArgs.IdArg, SessionArg
         };
@@ -92,6 +93,11 @@ public static class User
                 if (user.idlesecs > 0)
                 {
                     Console.WriteLine($"Idle Time: {Extension.FormatTime(user.idlesecs)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(user.comment))
+                {
+                    Console.WriteLine($"Comment: {user.comment.Truncate()}");
                 }
 
                 Console.WriteLine($"Transfer Rate: {user.bytespersec} bytes/s");
@@ -194,5 +200,48 @@ public static class User
         });
 
         return command;
+    }
+
+    public static Command CreateGetCommentCommand(MetaPrxProvider metaProvider)
+    {
+        var command = new Command("getcomment", "Get comment of a user on a virtual server")
+        {
+            CommonArgs.IdArg, SessionArg
+        };
+        command.SetAction(result =>
+        {
+            var serverId = result.GetValue(CommonArgs.IdArg);
+            var sessionId = result.GetValue(SessionArg);
+            var meta = metaProvider.GetMetaPrx();
+            var server = meta.getServer(serverId);
+            if (server is null)
+            {
+                throw new MumbleServerCliException("Virtual server not found.");
+            }
+
+            try
+            {
+                var user = server.getState(sessionId);
+
+                if (string.IsNullOrWhiteSpace(user.comment))
+                {
+                    Console.WriteLine($"User \"{user.name}\" has no comment set.");
+                    return;
+                }
+
+                Console.WriteLine($"Comment for user \"{user.name}\":\n");
+                Console.WriteLine(user.comment);
+            }
+            catch (ServerBootedException e)
+            {
+                throw new MumbleServerCliException("Virtual server is not running.", e);
+            }
+            catch (InvalidSessionException e)
+            {
+                throw new MumbleServerCliException("Session not found on virtual server.", e);
+            }
+        });
+
+       return command;
     }
 }
