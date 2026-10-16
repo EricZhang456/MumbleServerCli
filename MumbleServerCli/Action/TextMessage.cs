@@ -7,7 +7,7 @@ public static class TextMessage
 {
     private static readonly Argument<string> MessageArg = new("message")
     {
-        Description = "Text message to send"
+        Description = "Text Message"
     };
 
     public static Command CreateCommand(MetaPrxProvider metaProvider)

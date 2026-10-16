@@ -11,4 +11,12 @@ public static class Utils
         var server = meta.getServer(serverId);
         return server ?? throw new MumbleServerNotFoundException();
     }
+
+    public static (MumbleServer.User User, MumbleServer.ServerPrx Server)
+        ResolveUserFromParseResult(ParseResult result, MetaPrxProvider metaProvider)
+    {
+        var server = ResolveServerFromParseResult(result, metaProvider);
+        var sessionId = result.GetValue(CommonArgs.SessionArg);
+        return (server.getState(sessionId), server);
+    }
 }
