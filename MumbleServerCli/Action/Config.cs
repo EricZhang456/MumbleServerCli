@@ -20,11 +20,16 @@ public static class Config
         Description = "Superuser password"
     };
 
+    private static readonly Argument<string> OptionalKeyArg = new("key")
+    {
+        Description = "Configuration key",
+        Arity = ArgumentArity.ZeroOrOne
+    };
+
     public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("config", "Configure virtual servers");
 
-        command.Subcommands.Add(CreateGetAllCommand(metaProvider));
         command.Subcommands.Add(CreateGetCommand(metaProvider));
         command.Subcommands.Add(CreateGetDefaultCommand(metaProvider));
         command.Subcommands.Add(CreateSetCommand(metaProvider));
@@ -33,38 +38,28 @@ public static class Config
         return command;
     }
 
-    private static Command CreateGetAllCommand(MetaPrxProvider metaProvider)
-    {
-        var getAllCommand = new Command("getall", "Get all configuration values for a virtual server")
-        {
-            CommonArgs.IdArg
-        };
-        getAllCommand.SetAction(result =>
-        {
-            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-
-            var allConf = server.getAllConf();
-            Console.WriteLine($"Configuration values for virtual server ID {server.id()}:\n");
-            foreach (var i in allConf)
-            {
-                Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
-            }
-        });
-
-        return getAllCommand;
-    }
-
     private static Command CreateGetCommand(MetaPrxProvider metaProvider)
     {
-        var getCommand = new Command("get", "Get configuration value for a virtual server")
+        var getCommand = new Command("get", "Get configuration value(s) for a virtual server")
         {
-            CommonArgs.IdArg, KeyArg
+            CommonArgs.IdArg, OptionalKeyArg
         };
         getCommand.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var id = server.id();
-            var key = result.GetValue(KeyArg);
+            var key = result.GetValue(OptionalKeyArg);
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                var allConf = server.getAllConf();
+                Console.WriteLine($"Configuration values for virtual server ID {id}:\n");
+                foreach (var i in allConf)
+                {
+                    Console.WriteLine($"{i.Key} = {i.Value.Truncate()}");
+                }
+                return;
+            }
 
             try
             {
@@ -90,19 +85,14 @@ public static class Config
 
     private static Command CreateGetDefaultCommand(MetaPrxProvider metaProvider)
     {
-        var optionalKeyArg = new Argument<string>("key")
+        var getDefaultCommand = new Command("getdefault", "Get default configuration value(s) for a virtual server")
         {
-            Description = "Configuration key",
-            Arity = ArgumentArity.ZeroOrOne
-        };
-        var getDefaultCommand = new Command("getdefault", "Get default configuration values for a virtual server")
-        {
-            optionalKeyArg
+            OptionalKeyArg
         };
         getDefaultCommand.SetAction(result =>
         {
             var defaultConf = metaProvider.GetMetaPrx().getDefaultConf();
-            var targetKey = result.GetValue(optionalKeyArg);
+            var targetKey = result.GetValue(OptionalKeyArg);
 
             if (string.IsNullOrWhiteSpace(targetKey))
             {
