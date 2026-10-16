@@ -4,7 +4,7 @@ namespace MumbleServerCli.Action;
 
 public static class Uptime
 {
-    public static Command CreateUptimeCommand(MetaPrxProvider metaProvider)
+    public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("uptime", "Get the uptime of Mumble master instance");
         command.SetAction(_ =>

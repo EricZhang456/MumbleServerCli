@@ -20,7 +20,7 @@ public static class Config
         Description = "Superuser password"
     };
 
-    public static Command CreateConfigCommand(MetaPrxProvider metaProvider)
+    public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("config", "Configure virtual servers");
 

@@ -5,7 +5,7 @@ namespace MumbleServerCli.Action;
 
 public static class Server
 {
-    public static Command CreateServerCommand(MetaPrxProvider metaProvider)
+    public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("server", "Manage virtual servers");
 

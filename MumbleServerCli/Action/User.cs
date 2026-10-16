@@ -12,7 +12,7 @@ public static class User
         Description = "User Session ID"
     };
 
-    public static Command CreateUserCommand(MetaPrxProvider metaProvider)
+    public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("user", "Manage users on a virtual server");
 
