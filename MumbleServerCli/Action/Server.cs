@@ -147,15 +147,8 @@ public static class Server
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
-            try
-            {
-                var uptime = server.getUptime();
-                Console.WriteLine($"Virtual server {server.id()} has been up for: {Extension.FormatTime(uptime)}");
-            }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
+            var uptime = server.getUptime();
+            Console.WriteLine($"Virtual server {server.id()} has been up for: {Extension.FormatTime(uptime)}");
         });
 
         return uptimeCommand;

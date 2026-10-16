@@ -101,6 +101,21 @@ catch (InvalidSecretException)
     Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
     return 1;
 }
+catch (ServerBootedException)
+{
+    Console.WriteLine("Virtual server is not running.");
+    return 1;
+}
+catch (InvalidSessionException)
+{
+    Console.WriteLine("Session not found on virtual server.");
+    return 1;
+}
+catch (InvalidChannelException)
+{
+    Console.WriteLine("Channel not found on virtual server.");
+    return 1;
+}
 catch (MumbleServerCliException e)
 {
     Console.WriteLine(e.Message);

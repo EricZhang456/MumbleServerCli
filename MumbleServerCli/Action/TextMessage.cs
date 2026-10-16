@@ -32,19 +32,8 @@ public static class TextMessage
             var sessionId = result.GetValue(CommonArgs.SessionArg);
             var message = result.GetValue(MessageArg);
 
-            try
-            {
-                server.sendMessage(sessionId, message);
-                Console.WriteLine($"Message sent to session {sessionId}.");
-            }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
-            catch (InvalidSessionException e)
-            {
-                throw new MumbleServerCliException("Session not found on virtual server.", e);
-            }
+            server.sendMessage(sessionId, message);
+            Console.WriteLine($"Message sent to session {sessionId}.");
         });
 
         return command;
@@ -68,19 +57,8 @@ public static class TextMessage
             var message = result.GetValue(MessageArg);
             var cascade = result.GetValue(cascadeOpt);
 
-            try
-            {
-                server.sendMessageChannel(channelId, cascade, message);
-                Console.WriteLine($"Message sent to channel {channelId}.");
-            }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
-            catch (InvalidChannelException e)
-            {
-                throw new MumbleServerCliException("Channel not found on virtual server.", e);
-            }
+            server.sendMessageChannel(channelId, cascade, message);
+            Console.WriteLine($"Message sent to channel {channelId}.");
         });
 
         return command;

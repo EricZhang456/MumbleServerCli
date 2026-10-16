@@ -28,24 +28,17 @@ public static class Channel
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
 
-            try
+            var channels = server.getChannels();
+            if (channels.Count == 0)
             {
-                var channels = server.getChannels();
-                if (channels.Count == 0)
-                {
-                    Console.WriteLine("There are no channels on this virtual server.");
-                    return;
-                }
-
-                Console.WriteLine($"Listing {channels.Count} channel(s):\n");
-                foreach (var entry in channels)
-                {
-                    Console.WriteLine($"Channel ID: {entry.Value.id}, Name: \"{entry.Value.name}\"");
-                }
+                Console.WriteLine("There are no channels on this virtual server.");
+                return;
             }
-            catch (ServerBootedException e)
+
+            Console.WriteLine($"Listing {channels.Count} channel(s):\n");
+            foreach (var entry in channels)
             {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
+                Console.WriteLine($"Channel ID: {entry.Value.id}, Name: \"{entry.Value.name}\"");
             }
         });
 
@@ -63,56 +56,45 @@ public static class Channel
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var channelId = result.GetValue(CommonArgs.ChannelIdArg);
 
-            try
-            {
-                var channel = server.getChannelState(channelId);
+            var channel = server.getChannelState(channelId);
 
-                Console.WriteLine($"Information about channel {channel.id}:\n");
-                Console.WriteLine($"Name: {channel.name}");
-                Console.WriteLine($"Description: {channel.description.Truncate()}");
-                Console.WriteLine($"Temporary: {Extension.FormatBool(channel.temporary)}");
-                Console.WriteLine($"Position: {channel.position}");
-                if (channel.parent == -1)
+            Console.WriteLine($"Information about channel {channel.id}:\n");
+            Console.WriteLine($"Name: {channel.name}");
+            Console.WriteLine($"Description: {channel.description.Truncate()}");
+            Console.WriteLine($"Temporary: {Extension.FormatBool(channel.temporary)}");
+            Console.WriteLine($"Position: {channel.position}");
+            if (channel.parent == -1)
+            {
+                Console.WriteLine("Parent: none");
+            }
+            else
+            {
+                try
                 {
-                    Console.WriteLine("Parent: none");
+                    var parentChannel = server.getChannelState(channel.parent);
+                    Console.WriteLine($"Parent: {channel.parent} (Name: \"{parentChannel.name}\")");
                 }
-                else
+                catch (InvalidChannelException)
+                {
+                    Console.WriteLine($"Parent: {channel.parent}");
+                }
+            }
+
+            if (channel.links is not [])
+            {
+                Console.WriteLine("Linked Channels:");
+                foreach (var i in channel.links)
                 {
                     try
                     {
-                        var parentChannel = server.getChannelState(channel.parent);
-                        Console.WriteLine($"Parent: {channel.parent} (Name: \"{parentChannel.name}\")");
+                        var linkedChannel = server.getChannelState(i);
+                        Console.WriteLine($"\tChannel ID: {linkedChannel.id}, Name: \"{linkedChannel.name}\"");
                     }
                     catch (InvalidChannelException)
                     {
-                        Console.WriteLine($"Parent: {channel.parent}");
+                        Console.WriteLine($"\tChannel ID: {i}");
                     }
                 }
-
-                if (channel.links is not [])
-                {
-                    Console.WriteLine("Linked Channels:");
-                    foreach (var i in channel.links)
-                    {
-                        try
-                        {
-                            var linkedChannel = server.getChannelState(i);
-                            Console.WriteLine($"\tChannel ID: {linkedChannel.id}, Name: \"{linkedChannel.name}\"");
-                        }
-                        catch (InvalidChannelException)
-                        {
-                            Console.WriteLine($"\tChannel ID: {i}");
-                        }
-                    }
-                }
-            }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
-            catch (InvalidChannelException e)
-            {
-                throw new MumbleServerCliException("Channel not found on virtual server.", e);
             }
         });
 
@@ -145,10 +127,6 @@ public static class Channel
                 var newChannelId = server.addChannel(channelName, parentChannelId);
                 Console.WriteLine($"Created new channel with ID {newChannelId}.");
             }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
             catch (InvalidChannelException e)
             {
                 throw new MumbleServerCliException("Invalid channel name or parent channel ID.", e);
@@ -180,10 +158,6 @@ public static class Channel
                 server.removeChannel(channelId);
                 Console.WriteLine("Channel deleted.");
             }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
             catch (InvalidChannelException e)
             {
                 throw new MumbleServerCliException(
@@ -205,21 +179,10 @@ public static class Channel
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
             var channelId = result.GetValue(CommonArgs.ChannelIdArg);
 
-            try
-            {
-                var channel = server.getChannelState(channelId);
+            var channel = server.getChannelState(channelId);
 
-                Console.WriteLine($"Description of channel \"{channel.name}\":\n");
-                Console.WriteLine(channel.description);
-            }
-            catch (ServerBootedException e)
-            {
-                throw new MumbleServerCliException("Virtual server is not running.", e);
-            }
-            catch (InvalidChannelException e)
-            {
-                throw new MumbleServerCliException("Channel not found on virtual server.", e);
-            }
+            Console.WriteLine($"Description of channel \"{channel.name}\":\n");
+            Console.WriteLine(channel.description);
         });
 
         return command;
