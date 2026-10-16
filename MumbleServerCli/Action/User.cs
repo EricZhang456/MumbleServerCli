@@ -74,7 +74,11 @@ public static class User
                 Console.WriteLine($"Comment: {user.comment.Truncate()}");
             }
 
-            Console.WriteLine($"Transfer Rate: {user.bytespersec} bytes/s");
+            if (user.bytespersec > 0)
+            {
+                Console.WriteLine($"Transfer Rate: {user.bytespersec} bytes/s");
+            }
+
             Console.WriteLine($"TCP Only: {Extension.FormatBool(user.tcponly)}");
             Console.WriteLine($"TCP Ping: {Math.Round(user.tcpPing, 2)}");
             if (!user.tcponly)
