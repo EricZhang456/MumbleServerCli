@@ -11,5 +11,6 @@ public static class Router
         command.Subcommands.Add(Uptime.CreateCommand(metaProvider));
         command.Subcommands.Add(User.CreateCommand(metaProvider));
         command.Subcommands.Add(Channel.CreateCommand(metaProvider));
+        command.Subcommands.Add(TextMessage.CreateCommand(metaProvider));
     }
 }

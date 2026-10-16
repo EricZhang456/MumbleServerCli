@@ -8,4 +8,14 @@ public static class CommonArgs
     {
         Description = "Virtual Server ID"
     };
+
+    public static readonly Argument<int> ChannelIdArg = new("channel")
+    {
+        Description = "Channel ID"
+    };
+
+    public static readonly Argument<int> SessionArg = new("session")
+    {
+        Description = "User Session ID"
+    };
 }

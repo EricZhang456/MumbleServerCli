@@ -5,11 +5,6 @@ namespace MumbleServerCli.Action;
 
 public static class Channel
 {
-    private static readonly Argument<int> ChannelIdArg = new("channel")
-    {
-        Description = "Channel ID"
-    };
-
     public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("channel", "Manage channels on a virtual server");
@@ -61,12 +56,12 @@ public static class Channel
     {
         var command = new Command("info", "Get information about a channel in a virtual server")
         {
-            CommonArgs.IdArg, ChannelIdArg
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg
         };
         command.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var channelId = result.GetValue(ChannelIdArg);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
 
             try
             {
@@ -173,12 +168,12 @@ public static class Channel
         // Delete and from
         var command = new Command("delete", "Delete a channel from a virtual server")
         {
-            CommonArgs.IdArg, ChannelIdArg
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg
         };
         command.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var channelId = result.GetValue(ChannelIdArg);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
 
             try
             {
@@ -203,12 +198,12 @@ public static class Channel
     {
         var command = new Command("info", "Get description of a channel in a virtual server")
         {
-            CommonArgs.IdArg, ChannelIdArg
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg
         };
         command.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var channelId = result.GetValue(ChannelIdArg);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
 
             try
             {

@@ -7,11 +7,6 @@ namespace MumbleServerCli.Action;
 
 public static class User
 {
-    private static readonly Argument<int> SessionArg = new("session")
-    {
-        Description = "User Session ID"
-    };
-
     public static Command CreateCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("user", "Manage users on a virtual server");
@@ -63,12 +58,12 @@ public static class User
     {
         var command = new Command("info", "Get information about a user on a virtual server")
         {
-            CommonArgs.IdArg, SessionArg
+            CommonArgs.IdArg, CommonArgs.SessionArg
         };
         command.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var sessionId = result.GetValue(SessionArg);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
 
             try
             {
@@ -158,12 +153,12 @@ public static class User
         };
         var command = new Command("kick", "Kick a user from a virtual server")
         {
-            CommonArgs.IdArg, SessionArg, reasonArg
+            CommonArgs.IdArg, CommonArgs.SessionArg, reasonArg
         };
         command.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var sessionId = result.GetValue(SessionArg);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
             var reason = result.GetValue(reasonArg);
 
             try
@@ -188,12 +183,12 @@ public static class User
     {
         var command = new Command("getcomment", "Get comment of a user on a virtual server")
         {
-            CommonArgs.IdArg, SessionArg
+            CommonArgs.IdArg, CommonArgs.SessionArg
         };
         command.SetAction(result =>
         {
             var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var sessionId = result.GetValue(SessionArg);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
 
             try
             {
