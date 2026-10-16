@@ -170,7 +170,7 @@ public static class Channel
 
     private static Command CreateGetDescriptionCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("info", "Get description of a channel in a virtual server")
+        var command = new Command("getdesc", "Get description of a channel in a virtual server")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg
         };
