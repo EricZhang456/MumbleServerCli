@@ -202,7 +202,7 @@ public static class User
         return command;
     }
 
-    public static Command CreateGetCommentCommand(MetaPrxProvider metaProvider)
+    private static Command CreateGetCommentCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("getcomment", "Get comment of a user on a virtual server")
         {
