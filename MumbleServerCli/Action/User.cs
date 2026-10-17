@@ -1,5 +1,6 @@
 using System.Net;
 using System.CommandLine;
+using MumbleServer;
 using MumbleServerCli.Version;
 
 namespace MumbleServerCli.Action;
@@ -18,6 +19,8 @@ public static class User
         command.Subcommands.Add(CreateSuppressUserCommand(metaProvider));
         command.Subcommands.Add(CreatePrioritySpeakerCommand(metaProvider));
         command.Subcommands.Add(CreateMoveCommand(metaProvider));
+        command.Subcommands.Add(CreateGetListenCommand(metaProvider));
+        command.Subcommands.Add(CreateListenCommand(metaProvider));
         command.Subcommands.Add(CreateRenameCommand(metaProvider));
         command.Subcommands.Add(CreateGetCommentCommand(metaProvider));
         command.Subcommands.Add(CreateSetCommentCommand(metaProvider));
@@ -252,6 +255,69 @@ public static class User
             server.setState(user);
 
             Console.WriteLine($"User moved to channel {channelId}.");
+        });
+
+        return command;
+    }
+
+    private static Command CreateGetListenCommand(MetaPrxProvider metaProvider)
+    {
+        var command = new Command("getlisten", "Get a list of channels a user is listening to")
+        {
+            CommonArgs.IdArg, CommonArgs.SessionArg
+        };
+        command.SetAction(result =>
+        {
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
+
+            var listenChannels = server.getListeningChannels(sessionId);
+            if (listenChannels is [] or null)
+            {
+                Console.WriteLine($"User {sessionId} is not listening to any channels.");
+                return;
+            }
+
+            Console.WriteLine($"User {sessionId} is listening to:\n");
+            foreach (var i in listenChannels)
+            {
+                try
+                {
+                    var channel = server.getChannelState(i);
+                    Console.WriteLine($"Channel ID: {channel.id}, Name: \"{channel.name}\"");
+                }
+                catch (InvalidChannelException)
+                {
+                    Console.WriteLine($"Channel ID: ${i}");
+                }
+            }
+        });
+
+        return command;
+    }
+
+    private static Command CreateListenCommand(MetaPrxProvider metaProvider)
+    {
+        var command = new Command("listen", "Make a user listen or stop listening to a channel")
+        {
+            CommonArgs.IdArg, CommonArgs.SessionArg, CommonArgs.ChannelIdArg
+        };
+        command.SetAction(result =>
+        {
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
+
+            if (server.isListening(sessionId, channelId))
+            {
+                server.stopListening(sessionId, channelId);
+                Console.WriteLine($"User {sessionId} is now no longer listening to channel {channelId}.");
+            }
+            else
+            {
+                server.startListening(sessionId, channelId);
+                Console.WriteLine($"User {sessionId} is now listening to channel {channelId}.");
+            }
         });
 
         return command;

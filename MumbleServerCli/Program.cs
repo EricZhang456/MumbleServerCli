@@ -123,3 +123,27 @@ catch (MumbleServerCliException e)
     Console.WriteLine(e.Message);
     return 1;
 }
+catch (UnknownUserException e)
+{
+    switch (e.unknown)
+    {
+        case "::MumbleServer::InvalidSessionException":
+            Console.WriteLine("Session not found on virtual server.");
+            break;
+        case "::MumbleServer::InvalidChannelException":
+            Console.WriteLine("Channel not found on virtual server.");
+            break;
+        case "::MumbleServer::ServerBootedException":
+            Console.WriteLine("Virtual server is not running.");
+            break;
+        case "::MumbleServer::InvalidSecretException":
+            Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
+            break;
+        default:
+            Console.WriteLine("The Mumble Ice interface is throwing an exception not declared in the Ice file. Ask a Mumble developer to fix this!");
+            Console.WriteLine($"Exception thrown: {e.unknown}");
+            break;
+    }
+
+    return 1;
+}

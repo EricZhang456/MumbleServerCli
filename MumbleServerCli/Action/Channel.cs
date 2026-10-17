@@ -1,4 +1,5 @@
 using System.CommandLine;
+using IceGrid;
 using MumbleServer;
 
 namespace MumbleServerCli.Action;
@@ -16,6 +17,7 @@ public static class Channel
         command.Subcommands.Add(CreateRenameChannelCommand(metaProvider));
         command.Subcommands.Add(CreateSetParentCommand(metaProvider));
         command.Subcommands.Add(CreateSetPositionCommand(metaProvider));
+        command.Subcommands.Add(CreateGetListenersCommand(metaProvider));
         command.Subcommands.Add(CreateGetDescriptionCommand(metaProvider));
         command.Subcommands.Add(CreateSetDescriptionCommand(metaProvider));
 
@@ -24,7 +26,7 @@ public static class Channel
 
     private static Command CreateListChannelCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("list", "List all channels in a virtual server")
+        var command = new Command("list", "List all channels")
         {
             CommonArgs.IdArg
         };
@@ -51,7 +53,7 @@ public static class Channel
 
     private static Command CreateChannelInfoCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("info", "Get information about a channel in a virtual server")
+        var command = new Command("info", "Get information about a channel")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg
         };
@@ -81,20 +83,22 @@ public static class Channel
                 }
             }
 
-            if (channel.links is not [])
+            if (channel.links is [] or null)
             {
-                Console.WriteLine("Linked Channels:");
-                foreach (var i in channel.links)
+                return;
+            }
+
+            Console.WriteLine("Linked Channels:");
+            foreach (var i in channel.links)
+            {
+                try
                 {
-                    try
-                    {
-                        var linkedChannel = server.getChannelState(i);
-                        Console.WriteLine($"\tChannel ID: {linkedChannel.id}, Name: \"{linkedChannel.name}\"");
-                    }
-                    catch (InvalidChannelException)
-                    {
-                        Console.WriteLine($"\tChannel ID: {i}");
-                    }
+                    var linkedChannel = server.getChannelState(i);
+                    Console.WriteLine($"\tChannel ID: {linkedChannel.id}, Name: \"{linkedChannel.name}\"");
+                }
+                catch (InvalidChannelException)
+                {
+                    Console.WriteLine($"\tChannel ID: {i}");
                 }
             }
         });
@@ -113,7 +117,7 @@ public static class Channel
             Description = "Parent Channel ID",
             DefaultValueFactory = _ => 0
         };
-        var command = new Command("create", "Create a new channel in a virtual server")
+        var command = new Command("create", "Create a new channel")
         {
             CommonArgs.IdArg, channelNameArg, parentChannelIdOpt
         };
@@ -175,7 +179,7 @@ public static class Channel
         {
             Description = "Channel Name"
         };
-        var command = new Command("rename", "Rename a channel in a virtual server")
+        var command = new Command("rename", "Rename a channel")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg, nameArg
         };
@@ -208,7 +212,7 @@ public static class Channel
         {
             Description = "Parent Channel"
         };
-        var command = new Command("setparent", "Set parent of a channel in a virtual server")
+        var command = new Command("setparent", "Set parent of a channel")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg, parentArg
         };
@@ -252,7 +256,7 @@ public static class Channel
         {
             Description = "Position"
         };
-        var command = new Command("setpos", "Set position of a channel in a virtual server")
+        var command = new Command("setpos", "Set position of a channel")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg, posArg
         };
@@ -279,9 +283,45 @@ public static class Channel
         return command;
     }
 
+    private static Command CreateGetListenersCommand(MetaPrxProvider metaProvider)
+    {
+        var command = new Command("getlisteners", "Get a list of listeners in a channel")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg
+        };
+        command.SetAction(result =>
+        {
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
+
+            var listeners = server.getListeningUsers(channelId);
+            if (listeners is [] or null)
+            {
+                Console.WriteLine($"Channel {channelId} has no listeners.");
+                return;
+            }
+
+            Console.WriteLine($"Listener(s) in channel {channelId}:\n");
+            foreach (var i in listeners)
+            {
+                try
+                {
+                    var user = server.getState(i);
+                    Console.WriteLine($"Session ID: {user.session}, Name: \"{user.name}\"");
+                }
+                catch (InvalidSessionException)
+                {
+                    Console.WriteLine($"Session ID: {i}");
+                }
+            }
+        });
+
+        return command;
+    }
+
     private static Command CreateGetDescriptionCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("getdesc", "Get description of a channel in a virtual server")
+        var command = new Command("getdesc", "Get description of a channel")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg
         };
@@ -308,7 +348,7 @@ public static class Channel
         {
             Description = "Description"
         };
-        var command = new Command("setdesc", "Set description of a channel in a virtual server")
+        var command = new Command("setdesc", "Set description of a channel")
         {
             CommonArgs.IdArg, CommonArgs.ChannelIdArg, descArg
         };
