@@ -43,7 +43,6 @@ public static class User
             }
 
             Console.WriteLine($"Listing {users.Count} user(s):\n");
-            Console.WriteLine();
             foreach (var entry in users)
             {
                 Console.WriteLine($"Session ID: {entry.Value.session}, Name: \"{entry.Value.name}\"");
