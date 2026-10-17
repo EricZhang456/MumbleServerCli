@@ -30,7 +30,7 @@ jobs:
       - name: Process artifacts
         run: |
           cd artifacts
-          rename "s/-Release/" *
+          rename "s/-Release//" *
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
