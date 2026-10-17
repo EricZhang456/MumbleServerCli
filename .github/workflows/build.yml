@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+      - "*.md"
+  pull_request:
+    paths-ignore:
+      - "*.md"
+  workflow_dispatch:
+    inputs:
+      build-config:
+        description: "Build configuration"
+        required: true
+        default: "Debug"
+        type: choice
+        options:
+          - Debug
+          - Release
+  workflow_call:
+    inputs:
+      build-config:
+        description: "Build configuration"
+        required: true
+        default: "Debug"
+        type: string
+
+jobs:
+  build:
+    name: Build (${{ matrix.target.rid }})
+    runs-on: ${{ matrix.target.runner }}
+    strategy:
+      matrix:
+        target:
+          - rid: linux-x64
+            runner: ubuntu-latest
+            os: linux
+          - rid: win-x64
+            runner: windows-latest
+            os: windows
+          - rid: osx
+            runner: macos-latest
+            os: macos
+    env:
+      MUMBLE_SERVER_CLI_BUILD_TYPE: ${{ inputs.build-config || 'Debug' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/checkout@v6
+        with:
+          dotnet-version: "10"
+
+      # PublishSingleFile breaks Ice exceptions somehow so we're not doing it
+      - name: Build
+        run:
+          dotnet publish --runtime ${{ matrix.target.rid }} -p:DebugType=embedded -p:PublishDir=publish -c ${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }} --self-contained
+
+      - name: Package
+        shell: bash
+        run: |
+          cd MumbleServerCli
+          if [ "${{ matrix.target.os }}" = macos ]; then
+            tar czf publish.tar.gz --no-mac-metadata -C output .
+          else
+            tar czf publish.tar.gz -C publish .
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: mumble-server-cli-${{ matrix.target.rid }}-${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }}
+          path: MumbleServerCli/publish.tar.gz
+          archive: false
