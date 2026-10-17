@@ -38,7 +38,7 @@ jobs:
           - rid: win-x64
             runner: windows-latest
             os: windows
-          - rid: osx
+          - rid: osx-arm64
             runner: macos-latest
             os: macos
     env:
