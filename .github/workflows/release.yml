@@ -23,6 +23,8 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: artifacts
+          merge-multiple: true
+          skip-decompress: true
 
       - name: Install rename
         run: |
