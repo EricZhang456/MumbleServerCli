@@ -18,6 +18,8 @@ public static class Channel
         command.Subcommands.Add(CreateSetParentCommand(metaProvider));
         command.Subcommands.Add(CreateSetPositionCommand(metaProvider));
         command.Subcommands.Add(CreateGetListenersCommand(metaProvider));
+        command.Subcommands.Add(CreateGetListenerVolumeAdjustmentCommand(metaProvider));
+        command.Subcommands.Add(CreateSetListenerVolumeAdjustmentCommand(metaProvider));
         command.Subcommands.Add(CreateGetDescriptionCommand(metaProvider));
         command.Subcommands.Add(CreateSetDescriptionCommand(metaProvider));
 
@@ -314,6 +316,51 @@ public static class Channel
                     Console.WriteLine($"Session ID: {i}");
                 }
             }
+        });
+
+        return command;
+    }
+
+    private static Command CreateGetListenerVolumeAdjustmentCommand(MetaPrxProvider metaProvider)
+    {
+        var command = new Command("getlistenervolume", "Get listener volume adjustment in a channel")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg, CommonArgs.SessionArg
+        };
+        command.SetAction(result =>
+        {
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
+
+            var volume = server.getListenerVolumeAdjustment(channelId, sessionId);
+
+            Console.WriteLine($"Listener volume adjustment for user {sessionId} in channel {channelId}: {volume}");
+        });
+
+        return command;
+    }
+
+    private static Command CreateSetListenerVolumeAdjustmentCommand(MetaPrxProvider metaProvider)
+    {
+        var volumeArg = new Argument<float>("volume")
+        {
+            Description = "Volume Adjustment"
+        };
+        var command = new Command("setlistenervolume", "Set listener volume adjustment in a channel")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg, CommonArgs.SessionArg, volumeArg
+        };
+        command.SetAction(result =>
+        {
+            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
+            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
+            var sessionId = result.GetValue(CommonArgs.SessionArg);
+            var volume = result.GetValue(volumeArg);
+
+            server.setListenerVolumeAdjustment(channelId, sessionId, volume);
+
+            Console.WriteLine($"Changed listener volume adjustment for user {sessionId} in channel {channelId}.");
         });
 
         return command;
