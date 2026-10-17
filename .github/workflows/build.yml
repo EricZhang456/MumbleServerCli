@@ -58,22 +58,24 @@ jobs:
         run:
           dotnet publish --runtime ${{ matrix.target.rid }} -p:DebugType=embedded -p:PublishDir=publish -c ${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }} --self-contained
 
-      - name: Package
+      - name: Package (POSIX)
         shell: bash
+        if: matrix.target.os != 'windows'
         run: |
           cd MumbleServerCli
           if [ "${{ matrix.target.os }}" = macos ]; then
             tar czf publish.tar.gz --no-mac-metadata -C publish .
-          elif [ "${{ matrix.target.os }}" = windows ]; then
-            pushd publish
-            zip -r ../mumble-server-cli-${{ matrix.target.rid }}-${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }}.zip .
-            popd
           else
             tar czf publish.tar.gz -C publish .
           fi
-          if [ "${{ matrix.target.os }}" != windows ]; then
-            mv publish.tar.gz mumble-server-cli-${{ matrix.target.rid }}-${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }}.tar.gz
-          fi
+          mv publish.tar.gz mumble-server-cli-${{ matrix.target.rid }}-${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }}.tar.gz
+
+      - name: Package (Windows)
+        shell: pwsh
+        if: matrix.target.os == 'windows'
+        run: |
+          Set-Location MumbleServerCli
+          Compress-Archive -Path "publish\*" -DestinationPath ".\mumble-server-cli-${{ matrix.target.rid }}-${{ env.MUMBLE_SERVER_CLI_BUILD_TYPE }}.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
