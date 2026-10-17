@@ -158,7 +158,7 @@ public static class User
 
     private static Command CreateMuteUserCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("mute", "Mute a user")
+        var command = new Command("mute", "Toggle mute on a user")
         {
             CommonArgs.IdArg, CommonArgs.SessionArg
         };
@@ -166,13 +166,10 @@ public static class User
         {
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
 
-            if (user.mute)
-            {
-                throw new MumbleServerCliException("User is already muted by the server.");
-            }
-
-            user.mute = true;
+            user.mute = !user.mute;
             server.setState(user);
+
+            Console.WriteLine(user.mute ? "Muted user." : "User unmuted.");
         });
 
         return command;
@@ -180,7 +177,7 @@ public static class User
 
     private static Command CreateDeafenUserCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("deafen", "Deafen a user")
+        var command = new Command("deafen", "Toggle deafen on a user")
         {
             CommonArgs.IdArg, CommonArgs.SessionArg
         };
@@ -188,13 +185,10 @@ public static class User
         {
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
 
-            if (user.deaf)
-            {
-                throw new MumbleServerCliException("User is already deafened by the server.");
-            }
-
-            user.deaf = true;
+            user.deaf = !user.deaf;
             server.setState(user);
+
+            Console.WriteLine(user.deaf ? "Deafened user." : "Undeafened user.");
         });
 
         return command;
@@ -202,7 +196,7 @@ public static class User
 
     private static Command CreateSuppressUserCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("suppress", "Suppress a user")
+        var command = new Command("suppress", "Toggle suppress a user")
         {
             CommonArgs.IdArg, CommonArgs.SessionArg
         };
@@ -210,13 +204,10 @@ public static class User
         {
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
 
-            if (user.suppress)
-            {
-                throw new MumbleServerCliException("User is already suppressed.");
-            }
-
-            user.suppress = true;
+            user.suppress = !user.suppress;
             server.setState(user);
+
+            Console.WriteLine(user.suppress ? "Suppressed user." : "Unsuppressed user.");
         });
 
         return command;
@@ -224,7 +215,7 @@ public static class User
 
     private static Command CreatePrioritySpeakerCommand(MetaPrxProvider metaProvider)
     {
-        var command = new Command("priority", "Make user a priority speaker")
+        var command = new Command("priority", "Toggle priority speaker on a user")
         {
             CommonArgs.IdArg, CommonArgs.SessionArg
         };
@@ -232,13 +223,10 @@ public static class User
         {
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
 
-            if (user.prioritySpeaker)
-            {
-                throw new MumbleServerCliException("User is already a priority Speaker.");
-            }
-
-            user.prioritySpeaker = true;
+            user.prioritySpeaker = !user.prioritySpeaker;
             server.setState(user);
+
+            Console.WriteLine(user.prioritySpeaker ? "User is now a priority speaker." : "User is no longer a priority speaker.");
         });
 
         return command;
@@ -262,6 +250,8 @@ public static class User
 
             user.channel = channelId;
             server.setState(user);
+
+            Console.WriteLine($"User moved to channel {channelId}.");
         });
 
         return command;
@@ -294,6 +284,8 @@ public static class User
 
             user.name = name;
             server.setState(user);
+
+            Console.WriteLine($"User renamed to \"{name}\".");
         });
 
         return command;
@@ -338,11 +330,6 @@ public static class User
         command.SetAction(result =>
         {
             var comment = result.GetValue(commentArg)?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(comment))
-            {
-                throw new MumbleServerCliException("Provided user comment is empty.");
-            }
-
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
 
             if (user.comment == comment)
@@ -352,6 +339,8 @@ public static class User
 
             user.comment = comment;
             server.setState(user);
+
+            Console.WriteLine(!string.IsNullOrWhiteSpace(comment) ? "User comment changed." : "User comment removed.");
         });
 
         return command;

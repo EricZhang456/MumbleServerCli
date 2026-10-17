@@ -195,6 +195,8 @@ public static class Channel
 
             channel.name = name;
             server.setChannelState(channel);
+
+            Console.WriteLine($"Channel renamed to \"{name}\".");
         });
 
         return command;
@@ -229,6 +231,7 @@ public static class Channel
             try
             {
                 server.setChannelState(channel);
+                Console.WriteLine($"Channel parent changed to {parent}.");
             }
             catch (NestingLimitException e)
             {
@@ -269,6 +272,8 @@ public static class Channel
 
             channel.position = position;
             server.setChannelState(channel);
+
+            Console.WriteLine("Channel position changed.");
         });
 
         return command;
@@ -283,6 +288,12 @@ public static class Channel
         command.SetAction(result =>
         {
             var channel = Utils.ResolveChannelFromParseResult(result, metaProvider).Channel;
+
+            if (string.IsNullOrWhiteSpace(channel.description))
+            {
+                Console.WriteLine($"Channel \"{channel.name}\" has no description set.");
+                return;
+            }
 
             Console.WriteLine($"Description of channel \"{channel.name}\":\n");
             Console.WriteLine(channel.description);
@@ -304,12 +315,8 @@ public static class Channel
         command.SetAction(result =>
         {
             var desc = result.GetValue(descArg)?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(desc))
-            {
-                throw new MumbleServerCliException("Provided description is empty");
-            }
-
             var (channel, server) = Utils.ResolveChannelFromParseResult(result, metaProvider);
+
             if (channel.description == desc)
             {
                 throw new MumbleServerCliException(
@@ -318,6 +325,9 @@ public static class Channel
 
             channel.description = desc;
             server.setChannelState(channel);
+
+            Console.WriteLine(!string.IsNullOrWhiteSpace(desc) ?
+                "Channel description changed." : "Channel description removed.");
         });
 
         return command;
