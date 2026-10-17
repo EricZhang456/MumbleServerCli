@@ -29,8 +29,9 @@ jobs:
 
       - name: Process artifacts
         run: |
-          cd artifacts
+          pushd artifacts
           rename "s/-Release//" *
+          popd
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
