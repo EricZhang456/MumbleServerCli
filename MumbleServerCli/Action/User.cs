@@ -283,7 +283,7 @@ public static class User
             var name = result.GetValue(nameArg)?.Trim() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new MumbleServerCliException("Provided username is empty");
+                throw new MumbleServerCliException("Provided username is empty.");
             }
 
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
@@ -341,7 +341,7 @@ public static class User
             var comment = result.GetValue(commentArg)?.Trim() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(comment))
             {
-                throw new MumbleServerCliException("Provided user comment is empty");
+                throw new MumbleServerCliException("Provided user comment is empty.");
             }
 
             var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);

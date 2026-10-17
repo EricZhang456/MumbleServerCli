@@ -17,6 +17,22 @@ public static class Utils
     {
         var server = ResolveServerFromParseResult(result, metaProvider);
         var sessionId = result.GetValue(CommonArgs.SessionArg);
+        if (sessionId < 0)
+        {
+            throw new MumbleServerCliException("Invalid session ID.");
+        }
         return (server.getState(sessionId), server);
+    }
+
+    public static (MumbleServer.Channel Channel, MumbleServer.ServerPrx Server)
+        ResolveChannelFromParseResult(ParseResult result, MetaPrxProvider metaProvider)
+    {
+        var server = ResolveServerFromParseResult(result, metaProvider);
+        var channelId = result.GetValue(CommonArgs.ChannelIdArg);
+        if (channelId < 0)
+        {
+            throw new MumbleServerCliException("Invalid channel ID.");
+        }
+        return (server.getChannelState(channelId), server);
     }
 }

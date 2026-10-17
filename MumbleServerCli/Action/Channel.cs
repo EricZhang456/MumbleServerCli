@@ -13,7 +13,11 @@ public static class Channel
         command.Subcommands.Add(CreateChannelInfoCommand(metaProvider));
         command.Subcommands.Add(CreateAddChannelCommand(metaProvider));
         command.Subcommands.Add(CreateRemoveChannelCommand(metaProvider));
+        command.Subcommands.Add(CreateRenameChannelCommand(metaProvider));
+        command.Subcommands.Add(CreateSetParentCommand(metaProvider));
+        command.Subcommands.Add(CreateSetPositionCommand(metaProvider));
         command.Subcommands.Add(CreateGetDescriptionCommand(metaProvider));
+        command.Subcommands.Add(CreateSetDescriptionCommand(metaProvider));
 
         return command;
     }
@@ -53,10 +57,7 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
-
-            var channel = server.getChannelState(channelId);
+            var (channel, server) = Utils.ResolveChannelFromParseResult(result, metaProvider);
 
             Console.WriteLine($"Information about channel {channel.id}:\n");
             Console.WriteLine($"Name: {channel.name}");
@@ -168,6 +169,111 @@ public static class Channel
         return command;
     }
 
+    private static Command CreateRenameChannelCommand(MetaPrxProvider metaProvider)
+    {
+        var nameArg = new Argument<string>("name")
+        {
+            Description = "Channel Name"
+        };
+        var command = new Command("rename", "Rename a channel in a virtual server")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg, nameArg
+        };
+        command.SetAction(result =>
+        {
+            var name = result.GetValue(nameArg)?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new MumbleServerCliException("Provided channel name is empty.");
+            }
+
+            var (channel, server) = Utils.ResolveChannelFromParseResult(result, metaProvider);
+            if (channel.name == name)
+            {
+                throw new MumbleServerCliException("Provided channel name is the same as the channel's current name.");
+            }
+
+            channel.name = name;
+            server.setChannelState(channel);
+        });
+
+        return command;
+    }
+
+    private static Command CreateSetParentCommand(MetaPrxProvider metaProvider)
+    {
+        var parentArg = new Argument<int>("parent")
+        {
+            Description = "Parent Channel"
+        };
+        var command = new Command("setparent", "Set parent of a channel in a virtual server")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg, parentArg
+        };
+        command.SetAction(result =>
+        {
+            var parent = result.GetValue(parentArg);
+            if (parent < 0)
+            {
+                throw new MumbleServerCliException("Invalid parent channel ID.");
+            }
+
+            var (channel, server) = Utils.ResolveChannelFromParseResult(result, metaProvider);
+            if (channel.parent == parent)
+            {
+                throw new MumbleServerCliException(
+                    "Provided parent channel is the same as the channel's current parent channel");
+            }
+
+            channel.parent = parent;
+            try
+            {
+                server.setChannelState(channel);
+            }
+            catch (NestingLimitException e)
+            {
+                throw new MumbleServerCliException("Nesting limit reached.", e);
+            }
+            catch (InvalidChannelException e)
+            {
+                throw new MumbleServerCliException("Provided parent channel not found on virtual server.", e);
+            }
+        });
+
+        return command;
+    }
+
+    private static Command CreateSetPositionCommand(MetaPrxProvider metaProvider)
+    {
+        var posArg = new Argument<int>("position")
+        {
+            Description = "Position"
+        };
+        var command = new Command("setpos", "Set position of a channel in a virtual server")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg, posArg
+        };
+        command.SetAction(result =>
+        {
+            var position = result.GetValue(posArg);
+            if (position < 0)
+            {
+                throw new MumbleServerCliException("Invalid position.");
+            }
+
+            var (channel, server) = Utils.ResolveChannelFromParseResult(result, metaProvider);
+            if (channel.position == position)
+            {
+                throw new MumbleServerCliException("Provided position is the same as the channel's current position.");
+            }
+
+            channel.position = position;
+            server.setChannelState(channel);
+        });
+
+        return command;
+    }
+
     private static Command CreateGetDescriptionCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("getdesc", "Get description of a channel in a virtual server")
@@ -176,13 +282,42 @@ public static class Channel
         };
         command.SetAction(result =>
         {
-            var server = Utils.ResolveServerFromParseResult(result, metaProvider);
-            var channelId = result.GetValue(CommonArgs.ChannelIdArg);
-
-            var channel = server.getChannelState(channelId);
+            var channel = Utils.ResolveChannelFromParseResult(result, metaProvider).Channel;
 
             Console.WriteLine($"Description of channel \"{channel.name}\":\n");
             Console.WriteLine(channel.description);
+        });
+
+        return command;
+    }
+
+    private static Command CreateSetDescriptionCommand(MetaPrxProvider metaProvider)
+    {
+        var descArg = new Argument<string>("description")
+        {
+            Description = "Description"
+        };
+        var command = new Command("setdesc", "Set description of a channel in a virtual server")
+        {
+            CommonArgs.IdArg, CommonArgs.ChannelIdArg, descArg
+        };
+        command.SetAction(result =>
+        {
+            var desc = result.GetValue(descArg)?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(desc))
+            {
+                throw new MumbleServerCliException("Provided description is empty");
+            }
+
+            var (channel, server) = Utils.ResolveChannelFromParseResult(result, metaProvider);
+            if (channel.description == desc)
+            {
+                throw new MumbleServerCliException(
+                    "Provided description is the same as the channel's current description.");
+            }
+
+            channel.description = desc;
+            server.setChannelState(channel);
         });
 
         return command;
