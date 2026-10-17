@@ -19,8 +19,8 @@ public static class User
         command.Subcommands.Add(CreatePrioritySpeakerCommand(metaProvider));
         command.Subcommands.Add(CreateMoveCommand(metaProvider));
         command.Subcommands.Add(CreateRenameCommand(metaProvider));
-        command.Subcommands.Add(CreateSetCommentCommand(metaProvider));
         command.Subcommands.Add(CreateGetCommentCommand(metaProvider));
+        command.Subcommands.Add(CreateSetCommentCommand(metaProvider));
 
         return command;
     }
@@ -300,38 +300,6 @@ public static class User
         return command;
     }
 
-    private static Command CreateSetCommentCommand(MetaPrxProvider metaProvider)
-    {
-        var commentArg = new Argument<string>("comment")
-        {
-            Description = "User Comment"
-        };
-        var command = new Command("comment", "Set comment on a user")
-        {
-            CommonArgs.IdArg, CommonArgs.SessionArg, commentArg
-        };
-        command.SetAction(result =>
-        {
-            var comment = result.GetValue(commentArg)?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(comment))
-            {
-                throw new MumbleServerCliException("Provided user comment is empty");
-            }
-
-            var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
-
-            if (user.comment == comment)
-            {
-                throw new MumbleServerCliException("Provided user comment is the same as the user's current comment.");
-            }
-
-            user.comment = comment;
-            server.setState(user);
-        });
-
-        return command;
-    }
-
     private static Command CreateGetCommentCommand(MetaPrxProvider metaProvider)
     {
         var command = new Command("getcomment", "Get comment of a user on a virtual server")
@@ -356,5 +324,37 @@ public static class User
         });
 
        return command;
+    }
+
+    private static Command CreateSetCommentCommand(MetaPrxProvider metaProvider)
+    {
+        var commentArg = new Argument<string>("comment")
+        {
+            Description = "User Comment"
+        };
+        var command = new Command("setcomment", "Set comment on a user")
+        {
+            CommonArgs.IdArg, CommonArgs.SessionArg, commentArg
+        };
+        command.SetAction(result =>
+        {
+            var comment = result.GetValue(commentArg)?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(comment))
+            {
+                throw new MumbleServerCliException("Provided user comment is empty");
+            }
+
+            var (user, server) = Utils.ResolveUserFromParseResult(result, metaProvider);
+
+            if (user.comment == comment)
+            {
+                throw new MumbleServerCliException("Provided user comment is the same as the user's current comment.");
+            }
+
+            user.comment = comment;
+            server.setState(user);
+        });
+
+        return command;
     }
 }
