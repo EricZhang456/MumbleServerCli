@@ -63,7 +63,7 @@ jobs:
         run: |
           cd MumbleServerCli
           if [ "${{ matrix.target.os }}" = macos ]; then
-            tar czf publish.tar.gz --no-mac-metadata -C output .
+            tar czf publish.tar.gz --no-mac-metadata -C publish .
           else
             tar czf publish.tar.gz -C publish .
           fi
