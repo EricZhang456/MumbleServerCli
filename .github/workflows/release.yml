@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
   push:
@@ -21,6 +21,11 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: artifacts
+
+      - name: Install rename
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install rename
 
       - name: Process artifacts
         run: |
