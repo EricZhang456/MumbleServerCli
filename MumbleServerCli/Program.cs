@@ -5,6 +5,7 @@ using Ice;
 using MumbleServer;
 using MumbleServerCli;
 
+using Exception = System.Exception;
 using Router = MumbleServerCli.Action.Router;
 using TimeoutException = Ice.TimeoutException;
 
@@ -61,8 +62,10 @@ try
     var props = Util.createProperties();
     props.setProperty("Ice.ImplicitContext", "Shared");
 
-    var initData = new InitializationData();
-    initData.properties = props;
+    var initData = new InitializationData
+    {
+        properties = props
+    };
 
     using var communicator = Ice.Util.initialize(initData);
     if (secretSet)
@@ -98,22 +101,22 @@ catch (TimeoutException)
     Console.WriteLine("Connection timed out.");
     return 1;
 }
-catch (InvalidSecretException)
+catch (Exception e) when (e is InvalidSecretException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::InvalidSessionException"))
 {
     Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
     return 1;
 }
-catch (ServerBootedException)
+catch (Exception e) when (e is ServerBootedException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::ServerBootedException"))
 {
     Console.WriteLine("Virtual server is not running.");
     return 1;
 }
-catch (InvalidSessionException)
+catch (Exception e) when (e is InvalidSessionException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::InvalidSessionException"))
 {
     Console.WriteLine("Session not found on virtual server.");
     return 1;
 }
-catch (InvalidChannelException)
+catch (Exception e) when (e is InvalidChannelException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::InvalidChannelException"))
 {
     Console.WriteLine("Channel not found on virtual server.");
     return 1;
@@ -125,25 +128,7 @@ catch (MumbleServerCliException e)
 }
 catch (UnknownUserException e)
 {
-    switch (e.unknown)
-    {
-        case "::MumbleServer::InvalidSessionException":
-            Console.WriteLine("Session not found on virtual server.");
-            break;
-        case "::MumbleServer::InvalidChannelException":
-            Console.WriteLine("Channel not found on virtual server.");
-            break;
-        case "::MumbleServer::ServerBootedException":
-            Console.WriteLine("Virtual server is not running.");
-            break;
-        case "::MumbleServer::InvalidSecretException":
-            Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
-            break;
-        default:
-            Console.WriteLine("The Mumble Ice interface is throwing an exception not declared in the Ice file. Ask a Mumble developer to fix this!");
-            Console.WriteLine($"Exception thrown: {e.unknown}");
-            break;
-    }
-
+    Console.WriteLine("The Mumble Ice interface is throwing an exception not declared in the Ice file. Ask a Mumble developer to fix this!");
+    Console.WriteLine($"Exception thrown: {e.unknown}");
     return 1;
 }
