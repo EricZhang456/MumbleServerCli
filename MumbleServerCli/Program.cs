@@ -101,22 +101,22 @@ catch (TimeoutException)
     Console.WriteLine("Connection timed out.");
     return 1;
 }
-catch (Exception e) when (e is InvalidSecretException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::InvalidSessionException"))
+catch (Exception e) when (e is InvalidSecretException or UnknownUserException { unknown: "::MumbleServer::InvalidSessionException" })
 {
     Console.WriteLine($"Invalid secret. Set {SECRET_ENV_VAR} to the correct secret.");
     return 1;
 }
-catch (Exception e) when (e is ServerBootedException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::ServerBootedException"))
+catch (Exception e) when (e is ServerBootedException or UnknownUserException { unknown: "::MumbleServer::ServerBootedException" })
 {
     Console.WriteLine("Virtual server is not running.");
     return 1;
 }
-catch (Exception e) when (e is InvalidSessionException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::InvalidSessionException"))
+catch (Exception e) when (e is InvalidSessionException or UnknownUserException { unknown: "::MumbleServer::InvalidSessionException" })
 {
     Console.WriteLine("Session not found on virtual server.");
     return 1;
 }
-catch (Exception e) when (e is InvalidChannelException || (e is UnknownUserException ex && ex.unknown == "::MumbleServer::InvalidChannelException"))
+catch (Exception e) when (e is InvalidChannelException or UnknownUserException { unknown: "::MumbleServer::InvalidChannelException" })
 {
     Console.WriteLine("Channel not found on virtual server.");
     return 1;

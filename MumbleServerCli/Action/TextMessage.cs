@@ -1,6 +1,7 @@
 using System.CommandLine;
 using Ice;
 using MumbleServer;
+using Exception = System.Exception;
 
 namespace MumbleServerCli.Action;
 
@@ -90,20 +91,11 @@ public static class TextMessage
                 server.sendWelcomeMessage([.. sessions]);
                 Console.WriteLine("Welcome message sent.");
             }
-            catch (InvalidSessionException e)
+            catch (Exception e) when(e is InvalidSessionException or UnknownUserException { unknown: "::MumbleServer::InvalidSessionException" })
             {
                 throw new MumbleServerCliException(
                     "One or more provided sessions not found on virtual server or is invalid.", e);
-            }
-            catch (UnknownUserException e)
-            {
-                if (e.unknown == "::MumbleServer::InvalidSessionException")
-                {
-                    throw new MumbleServerCliException(
-                        "One or more provided sessions not found on virtual server or is invalid.", e);
-                }
 
-                throw;
             }
         });
 
