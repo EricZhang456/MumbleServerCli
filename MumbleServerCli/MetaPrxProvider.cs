@@ -11,8 +11,5 @@ public class MetaPrxProvider
         _meta = meta;
     }
 
-    public MetaPrx GetMetaPrx()
-    {
-        return _meta ?? throw new SystemException("MetaPrx has not been registered yet.");
-    }
+    public MetaPrx GetMetaPrx() => _meta ?? throw new SystemException("MetaPrx has not been registered yet.");
 }

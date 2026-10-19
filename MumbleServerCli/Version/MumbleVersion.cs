@@ -23,8 +23,5 @@ public class MumbleVersion
     public int Patch { get; }
     public int Build { get; }
 
-    public override string ToString()
-    {
-        return Build > 0 ? $"{Major}.{Minor}.{Patch}.{Build}" : $"{Major}.{Minor}.{Patch}";
-    }
+    public override string ToString() => Build > 0 ? $"{Major}.{Minor}.{Patch}.{Build}" : $"{Major}.{Minor}.{Patch}";
 }

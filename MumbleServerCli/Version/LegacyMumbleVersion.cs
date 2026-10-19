@@ -20,8 +20,5 @@ public class LegacyMumbleVersion
     public int Minor { get; }
     public int Patch { get; }
 
-    public override string ToString()
-    {
-        return $"{Major}.{Minor}.{Patch}";
-    }
+    public override string ToString() => $"{Major}.{Minor}.{Patch}";
 }
