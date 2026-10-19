@@ -128,7 +128,7 @@ catch (MumbleServerCliException e)
 }
 catch (UnknownUserException e)
 {
-    Console.WriteLine("The Mumble Ice interface is throwing an exception not declared in the Ice file. Ask a Mumble developer to fix this!");
+    Console.WriteLine("The Mumble Ice interface is throwing an exception not declared in the Ice file.");
     Console.WriteLine($"Exception thrown: {e.unknown}");
     return 1;
 }
